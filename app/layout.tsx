@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: 'Tylers WTF Super-Private Lab',
   description:
     'A totally private, full-featured image generation lab with leading models. No login required. All images are saved to your browser cache.',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
 export default function RootLayout({
