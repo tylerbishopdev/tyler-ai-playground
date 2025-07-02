@@ -176,17 +176,17 @@ export const PlaygroundResults = () => {
         )}
 
         {(isPending || (data && data.length > 0)) && (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             <SkeletonList isPending={isPending} />
             {!isPending && (data || []).map((x, index) => (
               <div
                 key={x.url}
-                className="group relative bg-card border border-border hover:border-accent transition-all duration-300"
+                className="group relative bg-card border border-border hover:border-accent transition-all duration-300 rounded-lg overflow-hidden"
               >
                 <div className="aspect-square overflow-hidden">
                   <ImageDialog {...x} />
                 </div>
-                <div className="absolute top-3 left-3 bg-background/80 backdrop-blur-sm px-2 py-1 text-xs font-mono border border-border">
+                <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs font-mono border border-border rounded">
                   {String(index + 1).padStart(2, '0')}
                 </div>
               </div>

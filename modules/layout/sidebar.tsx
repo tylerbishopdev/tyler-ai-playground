@@ -17,7 +17,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
             {/* Mobile overlay */}
             <div
                 className={cn(
-                    'fixed inset-0 z-40 bg-black/60 transition-opacity lg:hidden',
+                    'fixed inset-0 z-40 bg-black/90 transition-opacity lg:hidden',
                     isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 )}
                 onClick={onClose}
@@ -26,7 +26,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 w-96 bg-background border-r border-border transition-transform duration-300 ease-in-out lg:relative lg:transform-none lg:transition-none',
+                    'fixed inset-y-0 left-0 z-50 w-80 sm:w-96 bg-zinc-800/95 lg:bg-zinc-800/90 backdrop-blur-sm lg:pt-3 lg:rounded-xl lg:mt-2 lg:ml-4 lg:border transition-transform duration-300 ease-in-out lg:relative lg:w-96 lg:transform-none lg:transition-none lg:h-fit',
                     isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                 )}
             >
@@ -44,23 +44,22 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
 
                     {/* Sidebar content */}
                     <div className="flex-1 overflow-y-auto">
-                        <div className="p-0 lg:p-3">
-                            <div className="hidden lg:block mb-8">
+                        <div className="p-3 lg:p-3">
+                            <div className="hidden lg:block mb-6">
                                 <div className="flex items-baseline space-x-4 mb-4">
-
                                     <h2 className="text-xl font-bold tracking-tight text-orange-100">Generate Image</h2>
                                 </div>
-
                             </div>
 
-                            <div className="form-section">
+                            <div className="form-section border-0 lg:border p-4 lg:p-6">
                                 {children}
                             </div>
-                            <p className="text-sm text-muted-foreground px-6 pt-2 mb-20">
-                                <span className="text-xs"> + Default model is fastest </span><br /><span className="text-xs text-orange-300/80"> ++ Images are cached by browser in Library. </span> <br /><span className="text-xs "> +++ Select Flux-Lora for trained subjects.</span>
+                            <p className="text-sm text-muted-foreground px-4 lg:px-6 pt-2 mb-20 lg:mb-6">
+                                <span className="text-xs"> + Default model is fastest </span><br />
+                                <span className="text-xs text-orange-300/80"> ++ Images are cached by browser in Library. </span><br />
+                                <span className="text-xs "> +++ Select Flux-Lora for trained subjects.</span>
                             </p>
                         </div>
-
                     </div>
                 </div >
             </div >

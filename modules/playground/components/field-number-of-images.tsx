@@ -24,7 +24,7 @@ export const FieldNumberOfImages = () => {
         <FormItem>
           <FormLabel>Number of images</FormLabel>
           <FormControl>
-            <div className="flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
               <Slider
                 disabled={form.formState.isSubmitting}
                 value={[Number(field.value) || 1]}
@@ -35,14 +35,14 @@ export const FieldNumberOfImages = () => {
                   field.onChange(value[0]);
                   field.onBlur();
                 }}
-                className={cn('w-full')}
+                className={cn('w-full flex-1')}
               />
               <Input
                 disabled={form.formState.isSubmitting}
                 {...field}
                 onChange={(event) => field.onChange(Number(event.target.value))}
                 type="number"
-                className="w-40"
+                className="w-full sm:w-20"
                 max={4}
                 min={1}
                 step={1}

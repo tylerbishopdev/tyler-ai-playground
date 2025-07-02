@@ -13,9 +13,10 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: 'AI Lab - Unusual Image Generator',
+  title: 'Tylers WTF Super-Private Lab',
   description:
-    'An unusual design tool for generating unique AI images. When everything is the same, different is the greatest opportunity.',
+    'A totally private, full-featured image generation lab with leading models. No login required. All images are saved to your browser cache.',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
 };
 
 export default function RootLayout({

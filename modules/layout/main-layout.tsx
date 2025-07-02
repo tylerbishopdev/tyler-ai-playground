@@ -34,20 +34,16 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
                 )}
 
                 {/* Main content area */}
-                <main className="flex-1 ">
-                    <div className="max-w-9xl mx-auto px-10">
+                <main className="flex-1 min-h-screen">
+                    <div className="w-full max-w-6xl mx-auto px-4 lg:px-8">
                         {/* Section Header */}
-                        <div className="section-header px-0 pt-6">
+                        <div className="section-header px-4 pt-4 lg:pt-6">
 
-                            <div>
-                                <h1 className="text-sm  font-bold tracking-tight px-4 bg-orange-300/10 border-orange-300/20 rounded-full text-orange-300/70">
-                                    Image Generator
-                                </h1>
-                            </div>
+
                         </div>
 
                         {/* Content */}
-                        <div className="px-6 lg:px-12 py-12">
+                        <div  >
                             {children}
                         </div>
                     </div>

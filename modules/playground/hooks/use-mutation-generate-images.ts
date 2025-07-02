@@ -20,15 +20,31 @@ export const useMutationGenerateImages = () => {
     mutationKey: ['generate'],
     mutationFn: async (data: FormData) => {
       const response = await httpClient.post<OutputType>('/api/fal/generate', data);
-      addItemToLocalStorageGallery({ ...response.data, date: new Date() });
+
+      // Get the requested dimensions from form data for accurate fallbacks
+      const requestedWidth = Number(data.get('image_sizes_width')) || 1024;
+      const requestedHeight = Number(data.get('image_sizes_height')) || 768;
+
+      // Ensure all images have width/height properties with accurate fallbacks
+      const processedResponse = {
+        ...response.data,
+        images: (response.data?.images || []).map((image: any) => ({
+          ...image,
+          width: image.width || requestedWidth,
+          height: image.height || requestedHeight,
+          content_type: image.content_type || 'image/jpeg',
+        })),
+      };
+
+      addItemToLocalStorageGallery({ ...processedResponse, date: new Date() });
       queryClient.setQueriesData(
         {
           queryKey: ['generated-images'],
         },
-        response.data?.images || [],
+        processedResponse.images || [],
       );
       queryClient.refetchQueries({ queryKey: ['gallery'] });
-      return response.data;
+      return processedResponse;
     },
   });
 

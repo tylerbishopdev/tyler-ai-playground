@@ -16,15 +16,15 @@ export const Footer = () => {
         <>
             {/* Mobile Dock */}
             <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-                <div className="bg-background/90 border-t border-orange-300/5 lg:border-t-0 backdrop-blur-md  shadow-sm">
-                    <div className="flex items-center justify-center gap-4 px-3 py-1.5">
+                <div className="bg-background/95 border-t border-orange-300/10 backdrop-blur-md shadow-lg">
+                    <div className="flex items-center justify-center gap-2 px-4 py-2 safe-area-inset-bottom">
                         <Link
                             href="/"
                             className={cn(
-                                'flex flex-col items-center justify-center space-y-1  py-2 transition-all duration-300 w-1/2 border',
+                                'flex flex-col items-center justify-center space-y-1 py-3 px-4 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
                                 getActiveClass('/')
-                                    ? 'bg-orange-300/10 text-orange-300/50  shadow-sm shadow-orange-300/25 scale-105'
-                                    : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-accent/20 hover:scale-102 active:scale-95'
+                                    ? 'bg-orange-300/15 text-orange-300/80 shadow-sm shadow-orange-300/25'
+                                    : 'bg-card/50 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary/80 hover:border-accent/30 active:scale-95'
                             )}
                         >
                             <ImageIcon className={cn(
@@ -32,7 +32,7 @@ export const Footer = () => {
                                 getActiveClass('/') ? 'h-6 w-6' : 'h-5 w-5'
                             )} />
                             <span className={cn(
-                                'text-sm font-semibold transition-all duration-300',
+                                'text-xs font-semibold transition-all duration-300',
                                 getActiveClass('/') ? 'text-orange-300/90' : ''
                             )}>
                                 Create
@@ -42,10 +42,10 @@ export const Footer = () => {
                         <Link
                             href="/local-gallery"
                             className={cn(
-                                'flex flex-col items-center justify-center space-y-1 py-2  transition-all duration-300 w-1/2 border',
+                                'flex flex-col items-center justify-center space-y-1 py-3 px-4 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
                                 getActiveClass('/local-gallery')
-                                    ? 'bg-orange-300/20 text-orange-300/50  shadow-sm shadow-orange-300/25 scale-105'
-                                    : 'bg-card border-border text-muted-foreground hover:text-foreground hover:bg-secondary hover:border-accent/20 hover:scale-102 active:scale-95'
+                                    ? 'bg-orange-300/15 text-orange-300/80 shadow-sm shadow-orange-300/25'
+                                    : 'bg-card/50 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-secondary/80 hover:border-accent/30 active:scale-95'
                             )}
                         >
                             <FolderIcon className={cn(
@@ -53,7 +53,7 @@ export const Footer = () => {
                                 getActiveClass('/local-gallery') ? 'h-6 w-6' : 'h-5 w-5'
                             )} />
                             <span className={cn(
-                                'text-sm font-semibold transition-all duration-300',
+                                'text-xs font-semibold transition-all duration-300',
                                 getActiveClass('/local-gallery') ? 'text-orange-300/90' : ''
                             )}>
                                 Library
@@ -64,11 +64,11 @@ export const Footer = () => {
             </div>
 
             {/* Desktop Copyright */}
-            <div className="hidden lg:block ">
-                <div className=" bg-orange-300/5">
-                    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-2">
+            <div className="hidden lg:block lg:fixed lg:bottom-0 lg:left-0 lg:right-0 lg:z-50">
+                <div>
+                    <div className="max-w-7xl mx-auto px-6 lg:px-12 py-0">
                         <div className="text-center">
-                            <p className="text-[10px] text-muted-foreground font-mono">
+                            <p className="text-[10px] text-muted-foreground font-mono pb-2">
                                 copyright NotTyler.org 2025 - infinity
                             </p>
                         </div>

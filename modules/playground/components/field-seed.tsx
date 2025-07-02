@@ -30,11 +30,11 @@ export const FieldSeed = () => {
         <FormItem>
           <FormLabel>Seed</FormLabel>
           <FormControl>
-            <div className="flex flex-row items-center space-x-2">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center space-y-2 sm:space-y-0 sm:space-x-2">
               <Input
                 id="prompt"
                 placeholder="Random number"
-                className="w-full"
+                className="w-full flex-1"
                 {...field}
                 disabled={form.formState.isSubmitting}
               />
@@ -42,11 +42,14 @@ export const FieldSeed = () => {
                 disabled={form.formState.isSubmitting}
                 type="button"
                 variant="outline"
+                size="sm"
+                className="w-full sm:w-auto px-3"
                 onClick={() => {
                   field.onChange(generateRandomNumber(7));
                 }}
               >
-                <RefreshCcwIcon />
+                <RefreshCcwIcon className="h-4 w-4" />
+                <span className="ml-2 sm:hidden">Random</span>
               </Button>
             </div>
           </FormControl>
