@@ -11,9 +11,9 @@ interface HeaderProps {
 
 export const Header = ({ onMenuClick }: HeaderProps) => {
   return (
-    <header className="sticky top-0 z-50   bg-gradient-to-t from-background via-background/50 to-orange-300/5 backdrop-blur-sm ">
-      <div className="w-full lg:w-1/2 px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-20 lg:h-24 max-w-7xl mx-auto relative">
+    <header className="relative  z-50  mx-auto    backdrop-blur-sm ">
+      <div className="w-full lg:w-full px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 h-20 lg:h-24 max-w-7xl mx-auto relative">
           {/* Mobile menu button */}
           <div className="flex items-center lg:hidden">
             <Button
@@ -27,7 +27,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           </div>
 
           {/* Logo - Centered on mobile, left-aligned on desktop */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 lg:relative lg:left-0 lg:transform-none">
+          <div className="absolute left-1/2 transform -translate-x-1/2 lg:flex lg:justify-center">
             <Link href="/" className="flex items-center">
               <div className="section-number">
                 <Image
@@ -43,17 +43,17 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           </div>
 
           {/* Desktop navigation - centered */}
-          <nav className="hidden lg:flex space-x-2 absolute left-1/2 transform -translate-x-1/2">
+          <nav className="hidden lg:flex space-x-2  transform -translate-x-full">
             <Link
               href="/"
-              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 border p-2 rounded-full px-4"
+              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 shadow-orange-300/10 shadow-lg border p-2 rounded-full px-4"
             >
               <span className="section-number">+</span>
               <span className="tracking-tight font-bold font-mono">Create New</span>
             </Link>
             <Link
               href="/local-gallery"
-              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 border p-2 rounded-full px-4"
+              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 shadow-orange-300/10 shadow-lg border p-2 rounded-full px-4"
             >
               <span className="section-number">@</span>
               <span className="tracking-tight font-bold font-mono">Your Library</span>

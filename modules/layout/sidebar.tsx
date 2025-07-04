@@ -17,7 +17,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
             {/* Mobile overlay */}
             <div
                 className={cn(
-                    'fixed inset-0 z-40 bg-black/90 transition-opacity lg:hidden',
+                    'fixed inset-1 z-40 bg-black/70 transition-opacity lg:hidden ',
                     isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 )}
                 onClick={onClose}
@@ -26,32 +26,32 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 w-80 sm:w-96 bg-zinc-800/95 lg:bg-zinc-800/90 backdrop-blur-sm lg:pt-3 lg:rounded-xl lg:mt-2 lg:ml-4 lg:border transition-transform duration-300 ease-in-out lg:relative lg:w-96 lg:transform-none lg:transition-none lg:h-fit',
+                    'fixed inset-y-0 left-0 z-50 w-96 border-r border-border  lg:border-zinc-400/10 lg:border-2 shadow-orange-400/10 shadow-2xl bg-gradient-to-br from-transparent via-zinc-950/20 to-zinc-500/0 backdrop-blur-lg lg:pt-3 lg:rounded-xl  lg:ml-4  transition-transform duration-300 ease-in-out lg:fixed lg:w-auto lg:mt-28 lg:transform-none lg:transition-none lg:h-fit',
                     isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                 )}
             >
                 <div className="flex h-full flex-col">
                     {/* Mobile header */}
-                    <div className="flex items-center justify-between p-2 border-b border-border lg:hidden">
+                    <div className="flex items-center justify-between  p-4 lg:hidden">
                         <div className="flex items-center space-x-4">
 
-                            <h2 className="text-lg font-bold">Generate</h2>
+                            <h2 className="text-2xl font-bold">Magic Controls</h2>
                         </div>
-                        <Button variant="ghost" size="sm" onClick={onClose}>
-                            <X className="h-4 w-4" />
+                        <Button variant="default" size="default" onClick={onClose}>
+                            <X className="h-3 w-3" />
                         </Button>
                     </div>
 
                     {/* Sidebar content */}
-                    <div className="flex-1 overflow-y-auto">
+                    <div className="flex-1 overflow-y-auto min-w-96">
                         <div className="p-3 lg:p-3">
                             <div className="hidden lg:block mb-6">
                                 <div className="flex items-baseline space-x-4 mb-4">
-                                    <h2 className="text-xl font-bold tracking-tight text-orange-100">Generate Image</h2>
+                                    <h2 className="text-xl font-bold tracking-tight text-orange-100 text-center mx-auto">Magic Controls</h2>
                                 </div>
                             </div>
 
-                            <div className="form-section border-0 lg:border p-4 lg:p-6">
+                            <div className="form-section bg-transparent border-none p-4 lg:p-6">
                                 {children}
                             </div>
                             <p className="text-sm text-muted-foreground px-4 lg:px-6 pt-2 mb-20 lg:mb-6">

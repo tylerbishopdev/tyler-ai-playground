@@ -22,7 +22,7 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
     };
 
     return (
-        <div className="min-h-screen bg-background text-foreground">
+        <div className="min-h-screen bg-gradient-to-br from-black/80 via-black to-black/90 text-foreground">
             <Header onMenuClick={handleMenuClick} />
 
             <div className="flex">

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import * as React from 'react';
+import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { useMutationGenerateImages } from './hooks/use-mutation-generate-images';
 import { FormType } from './types/form.type';
@@ -119,7 +120,7 @@ export const PlaygroundForm = () => {
   }, [isFluxLoraModel, form]);
 
   return (
-    <form className="space-y-6" onSubmit={form.handleSubmit(submit)}>
+    <form className="space-y-6 " onSubmit={form.handleSubmit(submit)}>
       <FieldModelId />
       {isFluxLoraModel && <FieldLora />}
       <FieldPrompt />
@@ -127,11 +128,11 @@ export const PlaygroundForm = () => {
       <FieldNumberOfImages />
       <FieldSeed />
 
-      <div className="pt-4 border-t border-border">
+      <div className="pt-4 ">
         <Button
           disabled={isPending}
           type="submit"
-          className="unusual-button w-full"
+          className="unusual-button lg:w-4/5 w-3/4 mx-auto justify-center flex"
         >
           {isPending ? 'Generating...' : 'Generate'}
         </Button>
@@ -160,17 +161,19 @@ export const PlaygroundResults = () => {
         )}
 
         {hasNoData && (
-          <div className="flex flex-col items-center justify-center py-24 text-center">
-            <div className="max-w-md space-y-6">
-              <div className="space-y-2">
-                <h3>No Images Yet</h3>
-                <p className="text-muted-foreground">
-                  Use the menu to generate images here. Past images are saved in the browser and accessable to in your gallery.
+          <div className="flex flex-col items-center justify-center py-14 text-center mx-auto ">
+            <div className="max-w-lg space-y-2 ">
+              <div className="space-y-0">
+
+                <h3 className=" font-light  text-pink-300  ">Image Will Show Here</h3>
+                <div className="w-64 h-64 rounded-xl mx-auto flex items-center justify-center">
+                  <Image src="/tplace.png" alt="Placeholder" width={288} height={228} className="rounded-xl shadow-pink-300/30 shadow-xl opacity-80" />
+                </div>
+                <p className="text-muted-foreground text-xs">
+                  Use the magic controls to generate an image. You can save images or view previous generated images stored in your browser cache in your library.
                 </p>
               </div>
-              <div className="w-32 h-32 mx-auto border border-dashed border-border rounded-lg flex items-center justify-center">
-                <div className="text-4xl text-muted-foreground">+</div>
-              </div>
+
             </div>
           </div>
         )}
