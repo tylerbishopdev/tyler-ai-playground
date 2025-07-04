@@ -11,7 +11,7 @@ interface HeaderProps {
 
 export const Header = ({ onMenuClick }: HeaderProps) => {
   return (
-    <header className="relative  z-50  mx-auto    backdrop-blur-sm ">
+    <header className="sticky w-full mx-auto z-50  mx-auto    backdrop-blur-sm ">
       <div className="w-full lg:w-full px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 h-20 lg:h-24 max-w-7xl mx-auto relative">
           {/* Mobile menu button */}
@@ -43,7 +43,7 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           </div>
 
           {/* Desktop navigation - centered */}
-          <nav className="hidden lg:flex space-x-2  transform -translate-x-full">
+          <nav className="hidden lg:flex space-x-28 mx-auto ">
             <Link
               href="/"
               className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 shadow-orange-300/10 shadow-lg border p-2 rounded-full px-4"
