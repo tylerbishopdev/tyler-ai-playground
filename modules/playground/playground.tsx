@@ -17,13 +17,27 @@ import { SkeletonList } from '@/modules/playground/components/skeleton-list';
 import { FieldLora, LORA_MODELS } from '@/modules/playground/components/field-lora';
 import { FieldImageUpload } from '@/modules/playground/components/field-image-upload';
 
+// Client-only wrapper to prevent hydration issues
+const ClientOnlyWrapper = ({ children }: { children: React.ReactNode }) => {
+  const [hasMounted, setHasMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  if (!hasMounted) {
+    return null;
+  }
+
+  return <>{children}</>;
+};
+
 // Form component for the sidebar
 export const PlaygroundForm = () => {
   const { mutateAsync, isPending } = useMutationGenerateImages();
   const form = useFormContext<FormType>();
 
   const submit = async (body: FormType) => {
-    console.log('🎯 Submit function called!', body);
     const data = new FormData();
 
     // Set model-specific defaults for optimal performance
@@ -85,15 +99,7 @@ export const PlaygroundForm = () => {
 
     // Only add LoRA if flux-lora model is selected and a LoRA is chosen
     if (body.modelId === 'fal-ai/flux-lora' && body.selectedLora && body.selectedLora !== 'none') {
-      console.log('🎨 LoRA conditions met:', {
-        modelId: body.modelId,
-        selectedLora: body.selectedLora,
-        isFluxLora: body.modelId === 'fal-ai/flux-lora',
-        isNotNone: body.selectedLora !== 'none'
-      });
-
       const selectedLoraModel = LORA_MODELS.find(lora => lora.id === body.selectedLora);
-      console.log('🔍 Found LoRA model:', selectedLoraModel);
 
       if (selectedLoraModel) {
         const loraConfig = [{
@@ -101,55 +107,14 @@ export const PlaygroundForm = () => {
           weight: selectedLoraModel.weight,
           scale: selectedLoraModel.scale
         }];
-        console.log('🎯 LoRA config being sent:', loraConfig);
         data.set('loras', JSON.stringify(loraConfig));
-        console.log('📤 LoRA JSON string:', JSON.stringify(loraConfig));
-      } else {
-        console.log('❌ No LoRA model found for ID:', body.selectedLora);
       }
     } else {
-      console.log('❌ LoRA conditions not met:', {
-        modelId: body.modelId,
-        selectedLora: body.selectedLora,
-        isFluxLora: body.modelId === 'fal-ai/flux-lora',
-        isNotNone: body.selectedLora !== 'none'
-      });
       // If not flux-lora model or no LoRA selected, send empty array
       data.set('loras', JSON.stringify([]));
     }
 
-    console.log('📤 About to call mutateAsync...');
     await mutateAsync(data);
-    console.log('✅ mutateAsync completed');
-  };
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    console.log('🔥 Form submit event triggered!', e);
-    console.log('📋 Form state:', {
-      isValid: form.formState.isValid,
-      errors: form.formState.errors,
-      values: form.getValues()
-    });
-
-    // Log detailed error information
-    if (!form.formState.isValid) {
-      console.log('❌ Form validation failed!');
-      console.log('🐛 Detailed errors:', JSON.stringify(form.formState.errors, null, 2));
-
-      // Show errors for each field
-      Object.entries(form.formState.errors).forEach(([field, error]) => {
-        console.log(`❌ Field "${field}":`, error);
-      });
-    }
-
-    // Let react-hook-form handle the submission
-    form.handleSubmit(submit)(e);
-  };
-
-  const handleButtonClick = (e: React.MouseEvent) => {
-    console.log('🎯 Button clicked!', e);
-    console.log('👆 Button disabled?', isPending);
-    console.log('📝 Form values:', form.getValues());
   };
 
   const watchedModelId = form.watch('modelId');
@@ -182,26 +147,27 @@ export const PlaygroundForm = () => {
   }, [isStyleTransferModel, form]);
 
   return (
-    <form className="space-y-6 " onSubmit={handleFormSubmit}>
-      <FieldModelId />
-      {isFluxLoraModel && <FieldLora />}
-      {isStyleTransferModel && <FieldImageUpload />}
-      <FieldPrompt />
-      {!isStyleTransferModel && <FieldImageSize />}
-      <FieldNumberOfImages />
-      <FieldSeed />
+    <ClientOnlyWrapper>
+      <form className="space-y-6 " onSubmit={form.handleSubmit(submit)}>
+        <FieldModelId />
+        {isFluxLoraModel && <FieldLora />}
+        {isStyleTransferModel && <FieldImageUpload />}
+        <FieldPrompt />
+        {!isStyleTransferModel && <FieldImageSize />}
+        <FieldNumberOfImages />
+        <FieldSeed />
 
-      <div className="pt-4 ">
-        <Button
-          disabled={isPending}
-          type="submit"
-          className="unusual-button lg:w-4/5 w-3/4 mx-auto justify-center flex"
-          onClick={handleButtonClick}
-        >
-          {isPending ? 'Generating...' : 'Generate'}
-        </Button>
-      </div>
-    </form>
+        <div className="pt-4 ">
+          <Button
+            disabled={isPending}
+            type="submit"
+            className="unusual-button lg:w-4/5 w-3/4 mx-auto justify-center flex"
+          >
+            {isPending ? 'Generating...' : 'Generate'}
+          </Button>
+        </div>
+      </form>
+    </ClientOnlyWrapper>
   );
 };
 
@@ -212,58 +178,60 @@ export const PlaygroundResults = () => {
   const hasNoData = !isPending && !data?.length;
 
   return (
-    <div className="space-y-12">
-      {/* Images Grid */}
-      <div className="space-y-8">
-        {/* Image count display when there are images */}
-        {data && data.length > 0 && (
-          <div className="text-right">
-            <div className="text-sm text-muted-foreground font-mono">
-              {data.length} image{data.length !== 1 ? 's' : ''} generated
+    <ClientOnlyWrapper>
+      <div className="space-y-12">
+        {/* Images Grid */}
+        <div className="space-y-8">
+          {/* Image count display when there are images */}
+          {data && data.length > 0 && (
+            <div className="text-right">
+              <div className="text-sm text-muted-foreground font-mono">
+                {data.length} image{data.length !== 1 ? 's' : ''} generated
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {hasNoData && (
-          <div className="flex flex-col items-center justify-center py-14 text-center mx-auto ">
-            <div className="max-w-lg space-y-2 ">
-              <div className="space-y-0">
+          {hasNoData && (
+            <div className="flex flex-col items-center justify-center py-14 text-center mx-auto ">
+              <div className="max-w-lg space-y-2 ">
+                <div className="space-y-0">
 
 
-                <div className="w-40 h-40 pt-1 pb-1 flex rounded-xl mx-auto  items-center justify-center">
-                  <Image src="/tplace.png" alt="Placeholder" width={288} height={228} className="rounded-xl shadow-pink-300/30 shadow-xl opacity-80" />
+                  <div className="w-40 h-40 pt-1 pb-1 flex rounded-xl mx-auto  items-center justify-center">
+                    <Image src="/tplace.png" alt="Placeholder" width={288} height={228} className="rounded-xl shadow-pink-300/30 shadow-xl opacity-80" />
+                  </div>
+                  <h3 className=" font-light text-3xl tracking-tight text-pink-300 pb-4 ">Image Will Show Here</h3>
+                  <p className="text-muted-foreground text-sm w-3/4 mx-auto border-pink-300/30 border rounded-full py-2 px-1">
+                    Use menu to generate images. Save images or view previous ones stored in your in your library.
+                  </p>
+
                 </div>
-                <h3 className=" font-light text-3xl tracking-tight text-pink-300 pb-4 ">Image Will Show Here</h3>
-                <p className="text-muted-foreground text-sm w-3/4 mx-auto border-pink-300/30 border rounded-full py-2 px-1">
-                  Use menu to generate images. Save images or view previous ones stored in your in your library.
-                </p>
 
               </div>
-
             </div>
-          </div>
-        )}
+          )}
 
-        {(isPending || (data && data.length > 0)) && (
-          <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            <SkeletonList isPending={isPending} />
-            {!isPending && (data || []).map((x, index) => (
-              <div
-                key={x.url}
-                className="group relative bg-card border border-border hover:border-accent transition-all duration-300 rounded-lg overflow-hidden"
-              >
-                <div className="aspect-square overflow-hidden">
-                  <ImageDialog {...x} />
+          {(isPending || (data && data.length > 0)) && (
+            <div className="grid gap-3 sm:gap-4 lg:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <SkeletonList isPending={isPending} />
+              {!isPending && (data || []).map((x, index) => (
+                <div
+                  key={x.url}
+                  className="group relative bg-card border border-border hover:border-accent transition-all duration-300 rounded-lg overflow-hidden"
+                >
+                  <div className="aspect-square overflow-hidden">
+                    <ImageDialog {...x} />
+                  </div>
+                  <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs font-mono border border-border rounded">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
                 </div>
-                <div className="absolute top-2 left-2 bg-background/90 backdrop-blur-sm px-2 py-1 text-xs font-mono border border-border rounded">
-                  {String(index + 1).padStart(2, '0')}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </ClientOnlyWrapper>
   );
 };
 
