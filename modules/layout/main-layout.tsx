@@ -28,7 +28,7 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
             <div className="flex">
                 {/* Sidebar */}
                 {sidebar && (
-                    <Sidebar isOpen={sidebarOpen} onClose={handleSidebarClose}>
+                    <Sidebar isOpen={sidebarOpen} onCloseAction={handleSidebarClose}>
                         {sidebar}
                     </Sidebar>
                 )}
