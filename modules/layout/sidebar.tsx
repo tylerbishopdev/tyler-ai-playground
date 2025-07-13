@@ -8,10 +8,10 @@ import { cn } from '@/lib/utils';
 interface SidebarProps {
     children: React.ReactNode;
     isOpen: boolean;
-    onClose: () => void;
+    onCloseAction: () => void;
 }
 
-export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
+export const Sidebar = ({ children, isOpen, onCloseAction }: SidebarProps) => {
     return (
         <>
             {/* Mobile overlay */}
@@ -20,7 +20,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
                     'fixed inset-1 z-40 bg-black/70 transition-opacity lg:hidden ',
                     isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 )}
-                onClick={onClose}
+                onClick={onCloseAction}
             />
 
             {/* Sidebar */}
@@ -37,7 +37,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
 
                             <h2 className="text-2xl font-bold">Magic Controls</h2>
                         </div>
-                        <Button variant="default" size="default" onClick={onClose}>
+                        <Button variant="default" size="default" onClick={onCloseAction}>
                             <X className="h-3 w-3" />
                         </Button>
                     </div>
