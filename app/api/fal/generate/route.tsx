@@ -17,6 +17,7 @@ export async function POST(request: Request) {
   const image_sizes_width = formData.get('image_sizes_width');
   const image_sizes_height = formData.get('image_sizes_height');
   const loras = formData.get('loras');
+  console.log('🎨 API received loras:', loras);
 
   // Style transfer specific fields
   const image_url = formData.get('image_url');
@@ -76,6 +77,8 @@ export async function POST(request: Request) {
     sync_mode: Boolean(sync_mode === 'true'),
     loras: loras ? JSON.parse(String(loras)) : [],
   };
+
+  console.log('🚀 Final body being sent to FAL API:', JSON.stringify(body, null, 2));
 
   // Some models prefer image_size, others prefer width/height - provide both
   if (['fal-ai/ideogram/v3', 'fal-ai/imagen4/preview/fast', 'fal-ai/recraft/v3/text-to-image'].includes(modelId)) {

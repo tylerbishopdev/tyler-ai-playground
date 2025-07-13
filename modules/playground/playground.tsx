@@ -23,6 +23,7 @@ export const PlaygroundForm = () => {
   const form = useFormContext<FormType>();
 
   const submit = async (body: FormType) => {
+    console.log('🎯 Submit function called!', body);
     const data = new FormData();
 
     // Set model-specific defaults for optimal performance
@@ -84,21 +85,71 @@ export const PlaygroundForm = () => {
 
     // Only add LoRA if flux-lora model is selected and a LoRA is chosen
     if (body.modelId === 'fal-ai/flux-lora' && body.selectedLora && body.selectedLora !== 'none') {
+      console.log('🎨 LoRA conditions met:', {
+        modelId: body.modelId,
+        selectedLora: body.selectedLora,
+        isFluxLora: body.modelId === 'fal-ai/flux-lora',
+        isNotNone: body.selectedLora !== 'none'
+      });
+
       const selectedLoraModel = LORA_MODELS.find(lora => lora.id === body.selectedLora);
+      console.log('🔍 Found LoRA model:', selectedLoraModel);
+
       if (selectedLoraModel) {
         const loraConfig = [{
           path: selectedLoraModel.path,
           weight: selectedLoraModel.weight,
           scale: selectedLoraModel.scale
         }];
+        console.log('🎯 LoRA config being sent:', loraConfig);
         data.set('loras', JSON.stringify(loraConfig));
+        console.log('📤 LoRA JSON string:', JSON.stringify(loraConfig));
+      } else {
+        console.log('❌ No LoRA model found for ID:', body.selectedLora);
       }
     } else {
+      console.log('❌ LoRA conditions not met:', {
+        modelId: body.modelId,
+        selectedLora: body.selectedLora,
+        isFluxLora: body.modelId === 'fal-ai/flux-lora',
+        isNotNone: body.selectedLora !== 'none'
+      });
       // If not flux-lora model or no LoRA selected, send empty array
       data.set('loras', JSON.stringify([]));
     }
 
+    console.log('📤 About to call mutateAsync...');
     await mutateAsync(data);
+    console.log('✅ mutateAsync completed');
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    console.log('🔥 Form submit event triggered!', e);
+    console.log('📋 Form state:', {
+      isValid: form.formState.isValid,
+      errors: form.formState.errors,
+      values: form.getValues()
+    });
+
+    // Log detailed error information
+    if (!form.formState.isValid) {
+      console.log('❌ Form validation failed!');
+      console.log('🐛 Detailed errors:', JSON.stringify(form.formState.errors, null, 2));
+
+      // Show errors for each field
+      Object.entries(form.formState.errors).forEach(([field, error]) => {
+        console.log(`❌ Field "${field}":`, error);
+      });
+    }
+
+    // Let react-hook-form handle the submission
+    form.handleSubmit(submit)(e);
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    console.log('🎯 Button clicked!', e);
+    console.log('👆 Button disabled?', isPending);
+    console.log('📝 Form values:', form.getValues());
   };
 
   const watchedModelId = form.watch('modelId');
@@ -131,7 +182,7 @@ export const PlaygroundForm = () => {
   }, [isStyleTransferModel, form]);
 
   return (
-    <form className="space-y-6 " onSubmit={form.handleSubmit(submit)}>
+    <form className="space-y-6 " onSubmit={handleFormSubmit}>
       <FieldModelId />
       {isFluxLoraModel && <FieldLora />}
       {isStyleTransferModel && <FieldImageUpload />}
@@ -145,6 +196,7 @@ export const PlaygroundForm = () => {
           disabled={isPending}
           type="submit"
           className="unusual-button lg:w-4/5 w-3/4 mx-auto justify-center flex"
+          onClick={handleButtonClick}
         >
           {isPending ? 'Generating...' : 'Generate'}
         </Button>

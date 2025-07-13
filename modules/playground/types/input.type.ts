@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ImageSizeSchema, ImageSizeSchemaEnum } from '@/modules/playground/types/imageType';
 
 export const InputTypeSchema = z.object({
-  prompt: z.string().min(1).describe('The prompt to generate an image from.'),
+  prompt: z.string().min(1, 'Prompt is required').describe('The prompt to generate an image from.'),
   image_size: ImageSizeSchemaEnum,
   image_sizes: ImageSizeSchema,
   selectedLora: z.string().optional().describe('Selected LoRA model ID or "none"'),
@@ -44,8 +44,10 @@ export const InputTypeSchema = z.object({
   // Style transfer specific fields
   image_url: z
     .string()
-    .url()
     .optional()
+    .refine((val) => !val || val === '' || z.string().url().safeParse(val).success, {
+      message: 'Must be a valid URL or empty',
+    })
     .describe('URL of the input image for style transfer. Required for style transfer models.'),
   safety_tolerance: z
     .enum(['1', '2', '3', '4', '5'])

@@ -19,7 +19,7 @@ export function FormGeneratorProvider({ children }: { children: React.ReactNode 
       guidance_scale: 3.5,
       num_images: 1,
       num_inference_steps: 28,
-      prompt: '',
+      prompt: 'A beautiful landscape with mountains and a lake',
       seed: undefined,
       sync_mode: false,
       selectedLora: 'none',
