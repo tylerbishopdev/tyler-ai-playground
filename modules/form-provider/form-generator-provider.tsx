@@ -10,7 +10,7 @@ export function FormGeneratorProvider({ children }: { children: React.ReactNode 
   const form = useForm<FormType>({
     resolver: zodResolver(FormTypeSchema),
     defaultValues: {
-      modelId: 'fal-ai/flux/dev',
+      modelId: 'fal-ai/flux-pro',
       image_size: 'landscape_4_3',
       image_sizes: {
         ...IMAGE_SIZE_OPTIONS_MAPPER['landscape_4_3'],
@@ -23,6 +23,10 @@ export function FormGeneratorProvider({ children }: { children: React.ReactNode 
       seed: undefined,
       sync_mode: false,
       selectedLora: 'none',
+      // Style transfer specific defaults
+      image_url: '',
+      safety_tolerance: '2',
+      output_format: 'jpeg',
     },
   });
 

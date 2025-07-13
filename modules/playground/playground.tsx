@@ -15,6 +15,7 @@ import { FieldImageSize } from '@/modules/playground/components/field-image-size
 import { useQueryGeneratedImages } from '@/modules/playground/hooks/use-query-generated-images';
 import { SkeletonList } from '@/modules/playground/components/skeleton-list';
 import { FieldLora, LORA_MODELS } from '@/modules/playground/components/field-lora';
+import { FieldImageUpload } from '@/modules/playground/components/field-image-upload';
 
 // Form component for the sidebar
 export const PlaygroundForm = () => {
@@ -29,10 +30,6 @@ export const PlaygroundForm = () => {
     let guidanceScale = 3.5;
 
     switch (body.modelId) {
-      case 'fal-ai/flux/schnell':
-        inferenceSteps = 4;
-        guidanceScale = 1.0;
-        break;
       case 'fal-ai/flux-pro':
         inferenceSteps = 25;
         guidanceScale = 3.5;
@@ -45,31 +42,19 @@ export const PlaygroundForm = () => {
         inferenceSteps = 20;
         guidanceScale = 3.0;
         break;
-      case 'fal-ai/dreamo':
-        inferenceSteps = 25;
-        guidanceScale = 5.0;
-        break;
       case 'fal-ai/imagen4/preview/fast':
         inferenceSteps = 20;
         guidanceScale = 2.5;
-        break;
-      case 'fal-ai/imagen4/preview/ultra':
-        inferenceSteps = 40;
-        guidanceScale = 3.0;
         break;
       case 'fal-ai/recraft/v3/text-to-image':
         inferenceSteps = 25;
         guidanceScale = 4.0;
         break;
-      case 'fal-ai/playground-v25':
+      case 'fal-ai/image-editing/style-transfer':
         inferenceSteps = 30;
-        guidanceScale = 6.0;
+        guidanceScale = 3.5;
         break;
-      case 'fal-ai/realistic-vision':
-        inferenceSteps = 25;
-        guidanceScale = 7.0;
-        break;
-      default: // fal-ai/flux/dev and fal-ai/flux-lora
+      default: // fal-ai/flux-lora
         inferenceSteps = body.num_inference_steps || 28;
         guidanceScale = body.guidance_scale || 3.5;
         break;
@@ -84,9 +69,18 @@ export const PlaygroundForm = () => {
     data.set('seed', String(body.seed));
     data.set('sync_mode', String(body.sync_mode));
 
-    data.set('image_size', body.image_size);
-    data.set('image_sizes_width', String(body.image_sizes?.width || 200));
-    data.set('image_sizes_height', String(body.image_sizes?.height || 200));
+    // Style transfer specific fields
+    if (body.modelId === 'fal-ai/image-editing/style-transfer') {
+      data.set('image_url', body.image_url || '');
+      data.set('safety_tolerance', body.safety_tolerance || '2');
+      data.set('output_format', body.output_format || 'jpeg');
+      // Don't set image size fields for style transfer
+    } else {
+      // Regular text-to-image models
+      data.set('image_size', body.image_size);
+      data.set('image_sizes_width', String(body.image_sizes?.width || 200));
+      data.set('image_sizes_height', String(body.image_sizes?.height || 200));
+    }
 
     // Only add LoRA if flux-lora model is selected and a LoRA is chosen
     if (body.modelId === 'fal-ai/flux-lora' && body.selectedLora && body.selectedLora !== 'none') {
@@ -109,6 +103,7 @@ export const PlaygroundForm = () => {
 
   const watchedModelId = form.watch('modelId');
   const isFluxLoraModel = watchedModelId === 'fal-ai/flux-lora';
+  const isStyleTransferModel = watchedModelId === 'fal-ai/image-editing/style-transfer';
 
   // Set Tyler as default when switching to flux-lora model
   React.useEffect(() => {
@@ -119,12 +114,29 @@ export const PlaygroundForm = () => {
     }
   }, [isFluxLoraModel, form]);
 
+  // Set defaults for style transfer model
+  React.useEffect(() => {
+    if (isStyleTransferModel) {
+      // Set defaults for style transfer
+      if (!form.getValues('safety_tolerance')) {
+        form.setValue('safety_tolerance', '2');
+      }
+      if (!form.getValues('output_format')) {
+        form.setValue('output_format', 'jpeg');
+      }
+      // Clear image URL when switching away from style transfer
+    } else if (form.getValues('image_url')) {
+      form.setValue('image_url', '');
+    }
+  }, [isStyleTransferModel, form]);
+
   return (
     <form className="space-y-6 " onSubmit={form.handleSubmit(submit)}>
       <FieldModelId />
       {isFluxLoraModel && <FieldLora />}
+      {isStyleTransferModel && <FieldImageUpload />}
       <FieldPrompt />
-      <FieldImageSize />
+      {!isStyleTransferModel && <FieldImageSize />}
       <FieldNumberOfImages />
       <FieldSeed />
 
@@ -165,13 +177,15 @@ export const PlaygroundResults = () => {
             <div className="max-w-lg space-y-2 ">
               <div className="space-y-0">
 
-                <h3 className=" font-light  text-pink-300  ">Image Will Show Here</h3>
-                <div className="w-64 h-64 rounded-xl mx-auto flex items-center justify-center">
+
+                <div className="w-40 h-40 pt-1 pb-1 flex rounded-xl mx-auto  items-center justify-center">
                   <Image src="/tplace.png" alt="Placeholder" width={288} height={228} className="rounded-xl shadow-pink-300/30 shadow-xl opacity-80" />
                 </div>
-                <p className="text-muted-foreground text-xs">
-                  Use the magic controls to generate an image. You can save images or view previous generated images stored in your browser cache in your library.
+                <h3 className=" font-light text-3xl tracking-tight text-pink-300 pb-4 ">Image Will Show Here</h3>
+                <p className="text-muted-foreground text-sm w-3/4 mx-auto border-pink-300/30 border rounded-full py-2 px-1">
+                  Use menu to generate images. Save images or view previous ones stored in your in your library.
                 </p>
+
               </div>
 
             </div>

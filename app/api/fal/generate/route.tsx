@@ -18,7 +18,31 @@ export async function POST(request: Request) {
   const image_sizes_height = formData.get('image_sizes_height');
   const loras = formData.get('loras');
 
-  // Always convert to width/height object - some models require explicit dimensions
+  // Style transfer specific fields
+  const image_url = formData.get('image_url');
+  const safety_tolerance = formData.get('safety_tolerance');
+  const output_format = formData.get('output_format');
+
+  // Handle style transfer model differently
+  if (modelId === 'fal-ai/image-editing/style-transfer') {
+    const body = {
+      image_url: String(image_url || ''),
+      prompt: String(prompt || ''),
+      guidance_scale: Number(guidance_scale) || 3.5,
+      num_inference_steps: Number(num_inference_steps) || 30,
+      safety_tolerance: String(safety_tolerance || '2'),
+      output_format: String(output_format || 'jpeg') as 'jpeg' | 'png',
+    };
+
+    const result = await fal.subscribe(modelId, {
+      input: body,
+      logs: false,
+    });
+
+    return Response.json(result);
+  }
+
+  // Handle text-to-image models (existing logic)
   const getImageDimensions = () => {
     if (image_size === 'custom') {
       return {
@@ -38,7 +62,7 @@ export async function POST(request: Request) {
   const imageDimensions = getImageDimensions();
 
   // Build the request body with model-specific requirements
-  const body: Omit<InputType, 'image_sizes' | 'image_size' | 'selectedLora'> & {
+  const body: Omit<InputType, 'image_sizes' | 'image_size' | 'selectedLora' | 'image_url' | 'safety_tolerance' | 'output_format'> & {
     image_size?: InputType['image_size'] | InputType['image_sizes'];
     width?: number;
     height?: number;
@@ -54,7 +78,7 @@ export async function POST(request: Request) {
   };
 
   // Some models prefer image_size, others prefer width/height - provide both
-  if (['fal-ai/ideogram/v3', 'fal-ai/imagen4/preview/fast', 'fal-ai/imagen4/preview/ultra', 'fal-ai/recraft/v3/text-to-image', 'fal-ai/playground-v25', 'fal-ai/realistic-vision'].includes(modelId)) {
+  if (['fal-ai/ideogram/v3', 'fal-ai/imagen4/preview/fast', 'fal-ai/recraft/v3/text-to-image'].includes(modelId)) {
     // These models prefer explicit width/height
     body.width = imageDimensions.width;
     body.height = imageDimensions.height;
@@ -63,7 +87,7 @@ export async function POST(request: Request) {
     body.image_size = imageDimensions;
   }
 
-  const result = await fal.subscribe(modelId || 'fal-ai/flux/dev', {
+  const result = await fal.subscribe(modelId || 'fal-ai/flux-pro', {
     input: body,
     logs: false,
   });

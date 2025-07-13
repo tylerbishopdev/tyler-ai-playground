@@ -41,6 +41,20 @@ export const InputTypeSchema = z.object({
     .boolean()
     .optional()
     .describe('If set to true, the safety checker will be enabled. Default value: true'),
+  // Style transfer specific fields
+  image_url: z
+    .string()
+    .url()
+    .optional()
+    .describe('URL of the input image for style transfer. Required for style transfer models.'),
+  safety_tolerance: z
+    .enum(['1', '2', '3', '4', '5'])
+    .optional()
+    .describe('Safety tolerance level for style transfer. Default value: "2"'),
+  output_format: z
+    .enum(['jpeg', 'png'])
+    .optional()
+    .describe('Output format for the generated image. Default value: "jpeg"'),
 });
 
 export type InputType = z.infer<typeof InputTypeSchema>;

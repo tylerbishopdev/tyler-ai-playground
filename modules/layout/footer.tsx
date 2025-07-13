@@ -15,15 +15,15 @@ export const Footer = () => {
     return (
         <>
             {/* Mobile Dock */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 lg:hidden">
-                <div className="bg-background/95 border-t border-pink-300/10 backdrop-blur-md shadow-lg">
-                    <div className="flex items-center justify-center gap-2 px-4 py-2 safe-area-inset-bottom">
+            <div className="fixed bottom-0 left-0 right-0 z-0 lg:hidden">
+                <div className="bg-pink-400/0 border-t border--pink-400backdrop-blur-md shadow-lg">
+                    <div className="flex items-center justify-center gap-6 px-12 py-6 safe-area-inset-bottom">
                         <Link
                             href="/"
                             className={cn(
-                                'flex flex-col items-center justify-center space-y-1 py-3 px-4 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
+                                'flex flex-col items-center justify-center space-y-1 py-1 px-2 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
                                 getActiveClass('/')
-                                    ? 'bg-pink-300/20  shadow-pink-200/60 text-pink-300/80 shadow-sm '
+                                    ? 'bg-pink-300/5  border-pink-300/20 border text-pink-300/80 shadow-sm '
                                     : 'bg-card/50 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-pink-100/20 hover:border-accent/30 active:scale-95'
                             )}
                         >
@@ -42,9 +42,9 @@ export const Footer = () => {
                         <Link
                             href="/local-gallery"
                             className={cn(
-                                'flex flex-col items-center justify-center space-y-1 py-3 px-4 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
+                                'flex flex-col items-center justify-center space-y-1 py-1 px-2 rounded-lg transition-all duration-300 flex-1 min-h-[60px]',
                                 getActiveClass('/local-gallery')
-                                    ? 'bg-pink-300/15 text-pink-300/80 shadow-sm shadow-pink-300/25 '
+                                    ? 'bg-pink-300/5  border-pink-300/20 border text-pink-300/80 shadow-sm '
                                     : 'bg-card/50 border border-border/50 text-muted-foreground hover:text-foreground hover:bg-pink-100/20 hover:border-accent/30 active:scale-95'
                             )}
                         >
@@ -53,7 +53,7 @@ export const Footer = () => {
                                 getActiveClass('/local-gallery') ? 'h-6 w-6' : 'h-5 w-5'
                             )} />
                             <span className={cn(
-                                'text-xs font-semibold transition-all duration-300',
+                                'text-xs font-semibold transition-all duration-300 ',
                                 getActiveClass('/local-gallery') ? 'text-pink-300/90' : ''
                             )}>
                                 Library

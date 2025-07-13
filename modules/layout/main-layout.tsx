@@ -22,7 +22,7 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-black/80 via-black to-black/90 text-foreground">
+        <div className="min-h-screen w-full bg-gradient-to-br from-black/80 via-black to-black/90 text-foreground">
             <Header onMenuClick={handleMenuClick} />
 
             <div className="flex">
@@ -34,13 +34,10 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
                 )}
 
                 {/* Main content area */}
-                <main className="flex-1 min-h-screen">
-                    <div className="w-full max-w-6xl mx-auto px-4 lg:px-8">
+                <main className="flex-1 min-h-screen w-full">
+                    <div className="w-full max-w-9xl mx-auto px-4 lg:px-20 pt-32">
                         {/* Section Header */}
-                        <div className="section-header px-4 pt-4 lg:pt-6">
 
-
-                        </div>
 
                         {/* Content */}
                         <div  >

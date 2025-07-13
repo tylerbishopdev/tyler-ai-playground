@@ -26,7 +26,7 @@ export const Sidebar = ({ children, isOpen, onClose }: SidebarProps) => {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 w-96 border-r border-border  lg:border-zinc-400/10 lg:border-2 shadow-orange-400/10 shadow-2xl bg-gradient-to-br from-transparent via-zinc-950/20 to-zinc-500/0 backdrop-blur-lg lg:pt-3 lg:rounded-xl  lg:ml-4  transition-transform duration-300 ease-in-out lg:fixed lg:w-auto lg:mt-28 lg:transform-none lg:transition-none lg:h-fit',
+                    'fixed inset-y-0 left-0 z-50 w-96 border-r border-border  lg:border-zinc-400/10 lg:border-2 shadow-orange-400/10 shadow-2xl bg-gradient-to-br from-transparent via-zinc-950/20 to-zinc-500/0 backdrop-blur-lg lg:pt-3 lg:rounded-xl  lg:ml-0  transition-transform duration-300 ease-in-out lg:relative lg:w-auto lg:mt-0 lg:transform-none lg:transition-none lg:h-full',
                     isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                 )}
             >

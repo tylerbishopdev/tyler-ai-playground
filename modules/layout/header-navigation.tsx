@@ -30,7 +30,7 @@ export const HeaderNavigation = ({ orientation = 'horizontal', className }: Head
       <Link
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'font-medium justify-start',
+          ' justify-start',
           getActiveClass('home') && 'bg-accent font-semibold'
         )}
         href={paths.home}
@@ -40,7 +40,7 @@ export const HeaderNavigation = ({ orientation = 'horizontal', className }: Head
       <Link
         className={cn(
           buttonVariants({ variant: 'ghost', size: 'sm' }),
-          'font-medium justify-start',
+          'justify-start',
           getActiveClass('localGallery') && 'bg-accent font-semibold'
         )}
         href={paths.localGallery}
