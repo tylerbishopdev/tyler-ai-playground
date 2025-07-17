@@ -53,10 +53,6 @@ export const PlaygroundForm = () => {
         inferenceSteps = 30;
         guidanceScale = 7.5;
         break;
-      case 'fal-ai/luma-photon':
-        inferenceSteps = 20;
-        guidanceScale = 3.0;
-        break;
       case 'fal-ai/imagen4/preview/fast':
         inferenceSteps = 20;
         guidanceScale = 2.5;

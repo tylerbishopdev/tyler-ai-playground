@@ -6,7 +6,6 @@ const MODELS_TEXT_TO_IMAGE_IDS = [
   'fal-ai/flux-pro',
   'fal-ai/ideogram/v3',
   'fal-ai/flux-lora',
-  'fal-ai/luma-photon',
   'fal-ai/imagen4/preview/fast',
   'fal-ai/recraft/v3/text-to-image',
   'fal-ai/image-editing/style-transfer',
@@ -32,10 +31,6 @@ export const MODELS_TEXT_TO_IMAGE: readonly Model[] = [
   },
   {
     id: 'fal-ai/flux-lora',
-    tags: ['inference', 'commercial-use'],
-  },
-  {
-    id: 'fal-ai/luma-photon',
     tags: ['inference', 'commercial-use'],
   },
   {
