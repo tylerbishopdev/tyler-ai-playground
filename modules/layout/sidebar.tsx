@@ -17,7 +17,7 @@ export const Sidebar = ({ children, isOpen, onCloseAction }: SidebarProps) => {
             {/* Mobile overlay */}
             <div
                 className={cn(
-                    'fixed inset-1 z-40 bg-black/70 transition-opacity lg:hidden ',
+                    'fixed inset-1  z-40 bg-black/70 transition-opacity lg:hidden ',
                     isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
                 )}
                 onClick={onCloseAction}

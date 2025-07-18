@@ -7,12 +7,12 @@ import {
   Image as ImageGalleryType,
   ThumbnailImageProps,
 } from 'react-grid-gallery';
-import { ImageDialog } from '@/components/image-dialog';
+import { MediaDialog } from '@/components/media-dialog';
 import { AlertTriangle } from 'lucide-react';
 
 const ImageComponent = (props: ThumbnailImageProps) => {
   return (
-    <ImageDialog
+    <MediaDialog
       {...props.imageProps}
       url={props.imageProps.src}
       content_type={'image/jpeg'}

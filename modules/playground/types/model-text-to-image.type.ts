@@ -1,15 +1,25 @@
 import { z } from 'zod';
 
-export type ModelTag = 'inference' | 'commercial-use' | 'private' | 'optimized' | 'style-transfer';
+export type ModelTag =
+  | 'inference'
+  | 'commercial-use'
+  | 'private'
+  | 'optimized'
+  | 'style-transfer'
+  | 'video-generation'
+  | 'fashion-photoshoot'
+  | 'image-to-video';
 
 const MODELS_TEXT_TO_IMAGE_IDS = [
-  'fal-ai/flux-pro',
   'fal-ai/ideogram/v3',
+  'fal-ai/flux-pro',
   'fal-ai/flux-lora',
   'fal-ai/luma-photon',
   'fal-ai/imagen4/preview/fast',
-  'fal-ai/recraft/v3/text-to-image',
   'fal-ai/image-editing/style-transfer',
+  'fal-ai/veo3/fast',
+  'easel-ai/fashion-photoshoot',
+  'fal-ai/kling-video/v2.1/standard/image-to-video',
 ] as const;
 
 export const ModelTextToImageIdSchema = z.enum(MODELS_TEXT_TO_IMAGE_IDS);
@@ -23,11 +33,11 @@ type Model = {
 
 export const MODELS_TEXT_TO_IMAGE: readonly Model[] = [
   {
-    id: 'fal-ai/flux-pro',
+    id: 'fal-ai/ideogram/v3',
     tags: ['inference', 'commercial-use'],
   },
   {
-    id: 'fal-ai/ideogram/v3',
+    id: 'fal-ai/flux-pro',
     tags: ['inference', 'commercial-use'],
   },
   {
@@ -43,11 +53,19 @@ export const MODELS_TEXT_TO_IMAGE: readonly Model[] = [
     tags: ['inference', 'commercial-use', 'optimized'],
   },
   {
-    id: 'fal-ai/recraft/v3/text-to-image',
-    tags: ['inference', 'commercial-use'],
-  },
-  {
     id: 'fal-ai/image-editing/style-transfer',
     tags: ['inference', 'commercial-use', 'style-transfer'],
+  },
+  {
+    id: 'fal-ai/veo3/fast',
+    tags: ['inference', 'commercial-use', 'video-generation'],
+  },
+  {
+    id: 'easel-ai/fashion-photoshoot',
+    tags: ['inference', 'commercial-use', 'fashion-photoshoot'],
+  },
+  {
+    id: 'fal-ai/kling-video/v2.1/standard/image-to-video',
+    tags: ['inference', 'commercial-use', 'image-to-video'],
   },
 ] as const;

@@ -4,93 +4,206 @@ import { ImageSizeEnumType, IMAGE_SIZE_OPTIONS_MAPPER } from '@/modules/playgrou
 import { InputType } from '@/modules/playground/types/input.type';
 
 export async function POST(request: Request) {
-  const formData = await request.formData();
+  try {
+    const formData = await request.formData();
 
-  const modelId = formData.get('modelId') as ModelTextToImageId;
-  const prompt = formData.get('prompt');
-  const num_inference_steps = formData.get('num_inference_steps');
-  const guidance_scale = formData.get('guidance_scale');
-  const num_images = formData.get('num_images');
-  const enable_safety_checker = formData.get('enable_safety_checker');
-  const sync_mode = formData.get('sync_mode');
-  const image_size = formData.get('image_size') as ImageSizeEnumType;
-  const image_sizes_width = formData.get('image_sizes_width');
-  const image_sizes_height = formData.get('image_sizes_height');
-  const loras = formData.get('loras');
+    const modelId = formData.get('modelId') as ModelTextToImageId;
+    const prompt = formData.get('prompt');
+    const num_inference_steps = formData.get('num_inference_steps');
+    const guidance_scale = formData.get('guidance_scale');
+    const num_images = formData.get('num_images');
+    const enable_safety_checker = formData.get('enable_safety_checker');
+    const sync_mode = formData.get('sync_mode');
+    const image_size = formData.get('image_size') as ImageSizeEnumType;
+    const image_sizes_width = formData.get('image_sizes_width');
+    const image_sizes_height = formData.get('image_sizes_height');
+    const loras = formData.get('loras');
 
-  // Style transfer specific fields
-  const image_url = formData.get('image_url');
-  const safety_tolerance = formData.get('safety_tolerance');
-  const output_format = formData.get('output_format');
+    // Style transfer specific fields
+    const image_url = formData.get('image_url');
+    const safety_tolerance = formData.get('safety_tolerance');
+    const output_format = formData.get('output_format');
 
-  // Handle style transfer model differently
-  if (modelId === 'fal-ai/image-editing/style-transfer') {
-    const body = {
-      image_url: String(image_url || ''),
-      prompt: String(prompt || ''),
-      guidance_scale: Number(guidance_scale) || 3.5,
-      num_inference_steps: Number(num_inference_steps) || 30,
-      safety_tolerance: String(safety_tolerance || '2'),
-      output_format: String(output_format || 'jpeg') as 'jpeg' | 'png',
+    // Video generation specific fields
+    const aspect_ratio = formData.get('aspect_ratio');
+    const duration = formData.get('duration');
+    const enhance_prompt = formData.get('enhance_prompt');
+    const generate_audio = formData.get('generate_audio');
+
+    // Fashion photoshoot specific fields
+    const garment_image = formData.get('garment_image');
+    const face_image = formData.get('face_image');
+    const gender = formData.get('gender');
+    const body_size = formData.get('body_size');
+    const location = formData.get('location');
+
+    // Image-to-video specific fields
+    const resolution = formData.get('resolution');
+    const video_length = formData.get('video_length');
+
+    // Handle video generation model differently
+    if (modelId === 'fal-ai/veo3/fast') {
+      const body = {
+        prompt: String(prompt || ''),
+        aspect_ratio: String(aspect_ratio || '16:9'),
+        duration: String(duration || '8s'),
+        enhance_prompt: Boolean(enhance_prompt === 'true'),
+        generate_audio: Boolean(generate_audio === 'true'),
+      };
+
+      const result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS" && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+
+      return Response.json(result);
+    }
+
+    // Handle fashion photoshoot model differently
+    if (modelId === 'easel-ai/fashion-photoshoot') {
+      const body: any = {};
+
+      // Only include non-empty values
+      if (garment_image) body.garment_image = String(garment_image);
+      if (face_image) body.face_image = String(face_image);
+      if (gender) body.gender = String(gender);
+      if (body_size) body.body_size = String(body_size);
+      if (location) body.location = String(location);
+
+      // Set defaults for required fields if not provided
+      if (!body.gender) body.gender = 'male';
+      if (!body.body_size) body.body_size = 'M';
+      if (!body.location) body.location = 'park';
+
+      const result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS" && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+
+      return Response.json(result);
+    }
+
+    // Handle image-to-video model differently
+    if (modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
+      const body: any = {
+        prompt: String(prompt || ''),
+        duration: String(video_length || '5'),
+      };
+
+      // Only include image_url if it's not empty
+      if (image_url && String(image_url).trim()) {
+        body.image_url = String(image_url);
+      }
+
+      const result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS" && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+
+      return Response.json(result);
+    }
+
+    // Handle style transfer model differently
+    if (modelId === 'fal-ai/image-editing/style-transfer') {
+      const body: any = {
+        prompt: String(prompt || ''),
+        guidance_scale: Number(guidance_scale) || 3.5,
+        num_inference_steps: Number(num_inference_steps) || 30,
+        safety_tolerance: String(safety_tolerance || '2'),
+        output_format: String(output_format || 'jpeg') as 'jpeg' | 'png',
+      };
+
+      // Only include image_url if it's not empty
+      if (image_url && String(image_url).trim()) {
+        body.image_url = String(image_url);
+      }
+
+      const result = await fal.subscribe(modelId, {
+        input: body,
+        logs: false,
+      });
+
+      return Response.json(result);
+    }
+
+    // Handle text-to-image models (existing logic)
+    const getImageDimensions = () => {
+      if (image_size === 'custom') {
+        return {
+          width: Number(image_sizes_width) || 1024,
+          height: Number(image_sizes_height) || 768,
+        };
+      }
+
+      // Get preset dimensions from mapper
+      const presetDimensions = IMAGE_SIZE_OPTIONS_MAPPER[image_size || 'landscape_4_3'];
+      return {
+        width: presetDimensions?.width || 1024,
+        height: presetDimensions?.height || 768,
+      };
     };
 
-    const result = await fal.subscribe(modelId, {
+    const imageDimensions = getImageDimensions();
+
+    // Build the request body with model-specific requirements
+    const body: Omit<InputType, 'image_sizes' | 'image_size' | 'selectedLora' | 'image_url' | 'safety_tolerance' | 'output_format'> & {
+      image_size?: InputType['image_size'] | InputType['image_sizes'];
+      width?: number;
+      height?: number;
+      loras: any[];
+      image_url?: string;
+    } = {
+      prompt: String(prompt || ''),
+      num_inference_steps: Number(num_inference_steps) || 28,
+      guidance_scale: Number(guidance_scale) || 3.5,
+      num_images: Number(num_images) || 1,
+      enable_safety_checker: Boolean(enable_safety_checker === 'true'),
+      sync_mode: Boolean(sync_mode === 'true'),
+      loras: loras ? JSON.parse(String(loras)) : [],
+    };
+
+    // Only include image_url if it's provided and not empty
+    if (image_url && String(image_url).trim()) {
+      body.image_url = String(image_url);
+    }
+
+    // Some models prefer image_size, others prefer width/height - provide both
+    if (['fal-ai/flux-pro', 'fal-ai/imagen4/preview/fast'].includes(modelId)) {
+      // These models prefer explicit width/height
+      body.width = imageDimensions.width;
+      body.height = imageDimensions.height;
+    } else {
+      // Flux models and others can use image_size
+      body.image_size = imageDimensions;
+    }
+
+    const result = await fal.subscribe(modelId || 'fal-ai/ideogram/v3', {
       input: body,
       logs: false,
     });
 
     return Response.json(result);
-  }
-
-  // Handle text-to-image models (existing logic)
-  const getImageDimensions = () => {
-    if (image_size === 'custom') {
-      return {
-        width: Number(image_sizes_width) || 1024,
-        height: Number(image_sizes_height) || 768,
-      };
+  } catch (error) {
+    console.error('API Error:', error);
+    // Log detailed error information for debugging
+    if (error && typeof error === 'object' && 'body' in error) {
+      console.error('Error body:', JSON.stringify(error.body, null, 2));
     }
-
-    // Get preset dimensions from mapper
-    const presetDimensions = IMAGE_SIZE_OPTIONS_MAPPER[image_size || 'landscape_4_3'];
-    return {
-      width: presetDimensions?.width || 1024,
-      height: presetDimensions?.height || 768,
-    };
-  };
-
-  const imageDimensions = getImageDimensions();
-
-  // Build the request body with model-specific requirements
-  const body: Omit<InputType, 'image_sizes' | 'image_size' | 'selectedLora' | 'image_url' | 'safety_tolerance' | 'output_format'> & {
-    image_size?: InputType['image_size'] | InputType['image_sizes'];
-    width?: number;
-    height?: number;
-    loras: any[];
-  } = {
-    prompt: String(prompt || ''),
-    num_inference_steps: Number(num_inference_steps) || 28,
-    guidance_scale: Number(guidance_scale) || 3.5,
-    num_images: Number(num_images) || 1,
-    enable_safety_checker: Boolean(enable_safety_checker === 'true'),
-    sync_mode: Boolean(sync_mode === 'true'),
-    loras: loras ? JSON.parse(String(loras)) : [],
-  };
-
-  // Some models prefer image_size, others prefer width/height - provide both
-  if (['fal-ai/ideogram/v3', 'fal-ai/imagen4/preview/fast', 'fal-ai/recraft/v3/text-to-image'].includes(modelId)) {
-    // These models prefer explicit width/height
-    body.width = imageDimensions.width;
-    body.height = imageDimensions.height;
-  } else {
-    // Flux models and others can use image_size
-    body.image_size = imageDimensions;
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
-
-  const result = await fal.subscribe(modelId || 'fal-ai/flux-pro', {
-    input: body,
-    logs: false,
-  });
-
-  return Response.json(result);
 }

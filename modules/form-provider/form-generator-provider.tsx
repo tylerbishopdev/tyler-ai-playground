@@ -10,7 +10,7 @@ export function FormGeneratorProvider({ children }: { children: React.ReactNode 
   const form = useForm<FormType>({
     resolver: zodResolver(FormTypeSchema),
     defaultValues: {
-      modelId: 'fal-ai/flux-pro',
+      modelId: 'fal-ai/ideogram/v3',
       image_size: 'landscape_4_3',
       image_sizes: {
         ...IMAGE_SIZE_OPTIONS_MAPPER['landscape_4_3'],

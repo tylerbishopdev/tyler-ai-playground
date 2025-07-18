@@ -1,4 +1,4 @@
-import { ImageType } from './imageType';
+import { ImageType, VideoType, MediaType } from './imageType';
 
 export type OutputType = {
   seed: number;
@@ -9,3 +9,14 @@ export type OutputType = {
   };
   has_nsfw_concepts: [boolean];
 };
+
+export type VideoOutputType = {
+  video: VideoType;
+  prompt: string;
+  timings: {
+    inference: number;
+  };
+  has_nsfw_concepts?: boolean;
+};
+
+export type MediaOutputType = OutputType | VideoOutputType;

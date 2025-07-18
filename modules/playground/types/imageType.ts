@@ -28,6 +28,16 @@ export type ImageType = {
   content_type: 'image/jpeg';
 };
 
+export type VideoType = {
+  url: string;
+  width: number;
+  height: number;
+  content_type: 'video/mp4';
+  duration?: number;
+};
+
+export type MediaType = ImageType | VideoType;
+
 export const IMAGE_SIZE_OPTIONS_MAPPER: Record<ImageSizeEnumType, Partial<ImageSizeType>> = {
   custom: { width: undefined, height: undefined },
   square_hd: { width: 1024, height: 1024 },
