@@ -10,9 +10,17 @@ import {
 } from '@/components/ui/form';
 import { ImageUpload } from '@/components/image-upload';
 
+// Ensure image_url is registered immediately on mount so setValue works even
+// if the asynchronous upload finishes before React Hook Form registers it
+
 export const FieldImageUpload = () => {
     const form = useFormContext<FormType>();
     const watchedModelId = form.watch('modelId');
+
+    // Register field on first render
+    React.useEffect(() => {
+        form.register('image_url');
+    }, [form]);
 
     const getLabel = () => {
         if (watchedModelId === 'fal-ai/image-editing/style-transfer') {
