@@ -1,5 +1,8 @@
 import * as fal from '@fal-ai/serverless-client';
 
+// Ensure this route is always treated as dynamic to prevent any caching or prerendering issues
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();

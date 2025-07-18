@@ -36,13 +36,19 @@ export const FieldImageUpload = () => {
 
     return (
         <FormField
+            // Remount when the selected model changes so the field is always registered
+            key={watchedModelId}
             control={form.control}
             name="image_url"
             render={({ field }) => (
                 <FormItem>
                     <ImageUpload
                         value={field.value || ''}
-                        onChange={field.onChange}
+                        onChange={(url) => {
+                            // Ensure the field is registered before updating the value
+                            form.setValue('image_url', url, { shouldDirty: true });
+                            field.onChange(url);
+                        }}
                         label={getLabel()}
                         description={getDescription()}
                     />
