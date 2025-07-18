@@ -29,17 +29,14 @@ export const useMutationGenerateImages = () => {
       let processedResponse: any;
       let mediaItems: MediaType[] = [];
 
-      // Handle video response
-      if (
-        (modelId === 'fal-ai/veo3/fast' ||
-          modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') &&
-        'video' in response.data
-      ) {
+      // Handle video response (for any model that returns a `video` field)
+      if ('video' in response.data) {
         const videoResponse = response.data as VideoOutputType;
         const videoItem: VideoType = {
           ...videoResponse.video,
-          width: videoResponse.video.width || 1024,
-          height: videoResponse.video.height || 576,
+          // Ensure width/height fallback values if the API omits them
+          width: videoResponse.video.width || Number(data.get('image_sizes_width')) || 1024,
+          height: videoResponse.video.height || Number(data.get('image_sizes_height')) || 576,
           content_type: 'video/mp4',
         };
         mediaItems = [videoItem];
@@ -105,7 +102,7 @@ export const useMutationGenerateImages = () => {
     ...mutation,
     data: {
       ...mutation.data,
-      images: mutation.data?.images || mockedData,
+      images: (mutation.data as any)?.images || mockedData,
     },
   };
 };

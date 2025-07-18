@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     // Image-to-video specific fields
     const resolution = formData.get('resolution');
     const video_length = formData.get('video_length');
+    const seed = formData.get('seed');
 
     // Handle video generation model differently
     if (modelId === 'fal-ai/veo3/fast') {
@@ -104,6 +105,33 @@ export async function POST(request: Request) {
       if (image_url && String(image_url).trim()) {
         body.image_url = String(image_url);
       }
+
+      const result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === "IN_PROGRESS" && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+
+      return Response.json(result);
+    }
+
+    // Add explicit handler for Bytedance Seedance image-to-video model
+    if ((modelId as string) === 'fal-ai/bytedance/seedance/v1/lite/image-to-video') {
+      const body: any = {
+        prompt: String(prompt || ''),
+        // mandatory fields
+        image_url: image_url ? String(image_url) : '',
+      };
+
+      // Optional parameters
+      if (resolution) body.resolution = String(resolution); // expects '480p' | '720p' | '1080p'
+      if (video_length) body.duration = String(video_length); // accepts '5' | '10'
+      if (seed) body.seed = Number(seed);
+      if (formData.get('camera_fixed')) body.camera_fixed = Boolean(formData.get('camera_fixed') === 'true');
 
       const result = await fal.subscribe(modelId, {
         input: body,
