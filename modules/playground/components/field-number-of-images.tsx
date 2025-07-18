@@ -16,6 +16,14 @@ import { Slider } from '@/components/ui/slider';
 export const FieldNumberOfImages = () => {
   const form = useFormContext<FormType>();
 
+  // Debug logging for production issues
+  React.useEffect(() => {
+    const currentValue = form.getValues('num_images');
+    if (process.env.NODE_ENV === 'development') {
+      console.log('FieldNumberOfImages - current value:', currentValue, typeof currentValue);
+    }
+  }, [form]);
+
   return (
     <FormField
       control={form.control}
@@ -39,8 +47,15 @@ export const FieldNumberOfImages = () => {
               />
               <Input
                 disabled={form.formState.isSubmitting}
-                {...field}
-                onChange={(event) => field.onChange(Number(event.target.value))}
+                value={field.value ?? 1}
+                onChange={(event) => {
+                  const value = Number(event.target.value);
+                  if (!isNaN(value) && value >= 1 && value <= 4) {
+                    field.onChange(value);
+                  }
+                }}
+                onBlur={field.onBlur}
+                name={field.name}
                 type="number"
                 className="w-full sm:w-20"
                 max={4}

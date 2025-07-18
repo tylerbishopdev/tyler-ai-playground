@@ -35,7 +35,7 @@ export const InputTypeSchema = z.object({
     .min(1)
     .step(1)
     .max(4)
-    .optional()
+    .default(1)
     .describe('The number of images to generate. Default value: 1'),
   enable_safety_checker: z
     .boolean()
