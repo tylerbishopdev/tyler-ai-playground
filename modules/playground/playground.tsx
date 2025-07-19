@@ -132,10 +132,15 @@ export const PlaygroundForm = () => {
     }
     // Image-to-video specific fields
     else if (body.modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
-      // Only set image_url if it has a value
-      if (body.image_url && body.image_url.trim()) {
-        data.set('image_url', body.image_url);
+      // Validate that image_url is required for Kling video model
+      if (!body.image_url || !body.image_url.trim()) {
+        form.setError('image_url', {
+          type: 'manual',
+          message: 'Image URL is required for Kling video model',
+        });
+        return;
       }
+      data.set('image_url', body.image_url);
       data.set('duration', body.video_length || '5');
       // Don't set image size fields for image-to-video
     } else {

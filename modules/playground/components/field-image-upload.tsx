@@ -37,7 +37,7 @@ export const FieldImageUpload = () => {
             return 'Upload or provide URL for the image you want to apply style transfer to';
         }
         if (watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
-            return 'Upload or provide URL for the image you want to animate into a video';
+            return 'Upload or provide URL for the image you want to animate into a video (required)';
         }
         return 'Upload or provide URL for the image you want to process';
     };

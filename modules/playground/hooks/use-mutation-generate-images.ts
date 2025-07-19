@@ -23,7 +23,8 @@ export const useMutationGenerateImages = () => {
   const mutation = useMutation({
     mutationKey: ['generate'],
     mutationFn: async (data: FormData) => {
-      const response = await httpClient.post<MediaOutputType>('/api/fal/generate', data);
+      // Use the optimized endpoint with fal.run for real-time performance
+      const response = await httpClient.post<MediaOutputType>('/api/fal/optimized', data);
       const modelId = data.get('modelId') as string;
 
       let processedResponse: any;
