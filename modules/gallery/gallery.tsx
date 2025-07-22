@@ -37,19 +37,18 @@ export const Gallery = () => {
   }));
 
   return (
-    <div className="container h-full w-full">
+    <div className="container">
 
       {hasNoData && (
-        <div className="flex justify-center py-8 border border-accent max-w-xl mx-auto bg-accent/70 rounded-lg ">
+        <div className="flex flex-col justify-center py-8 border border-accent/50 rounded-xl max-w-xl mx-auto bg-accent/10  ">
 
 
-          <AlertTriangle className="w-10 h-10 mx-auto pb-2 " />
-          <h2 className="text-xl font-bold font-newake tracking-tight">  Images stored in browser </h2>
+          <AlertTriangle className="w-10 h-10 mx-auto pb-2 text-accent" />
+          <h2 className="text-xl text-center mx-auto font-neuve tracking-wide text-accent">  Images Stored In Browser Cache</h2>
 
-          <p className="text-sm pt-4 font-mono max-w-xl px-8">
-            Clearing browser cache deletes your gallery. You dont have to login to save
-            images and they&apos;re only stored on your device, but all are deleted
-            forever once browser history is cleared unless you save them.
+          <p className="text-xs text-center pt-4 font-mono max-w-xl px-8">
+            Your generated images are all stored here automatically via your devices browser cache, but all are deleted
+            forever once browser history is cleared  for this site unless downloaded.
           </p>
         </div>
       )}
