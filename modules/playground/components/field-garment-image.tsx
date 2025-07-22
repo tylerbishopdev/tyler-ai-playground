@@ -20,8 +20,7 @@ export const FieldGarmentImage = () => {
             render={({ field }) => (
                 <FormItem>
                     <ImageUpload
-                        value={field.value || ''}
-                        onChange={field.onChange}
+                        name="garment_image"
                         label="Garment Image"
                         description="Upload or provide URL for the garment/clothing image for the fashion photoshoot"
                         className="object-contain overflow-hidden lg:w-[420px] w-[330px]"

@@ -88,7 +88,6 @@ export const FieldLora = () => {
                             value={field.value || 'none'}
                             onValueChange={(value) => {
                                 field.onChange(value);
-                                field.onBlur();
                             }}
                         >
                             <SelectTrigger className="w-full">

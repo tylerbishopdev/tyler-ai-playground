@@ -46,14 +46,14 @@ export const Header = ({ onMenuClick }: HeaderProps) => {
           <nav className="hidden lg:flex space-x-28 mx-auto ">
             <Link
               href="/"
-              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 shadow-orange-300/10 shadow-lg border p-1 rounded-full px-4"
+              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-red-300 hover:bg-red-50/10 shadow-red-300/10 shadow-lg border p-1 rounded-full px-4"
             >
               <span className="section-number">+</span>
               <span className="tracking-tight font-bold font-mono">Create New</span>
             </Link>
             <Link
               href="/local-gallery"
-              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-orange-300 hover:bg-orange-50/10 shadow-orange-300/10 shadow-lg border p-2 rounded-full px-4"
+              className="flex items-center w-40 justify-center text-center mx-auto space-x-2 text-sm hover:text-accent transition-colors hover:text-red-300 hover:bg-red-50/10 shadow-red-300/10 shadow-lg border p-2 rounded-full px-4"
             >
               <span className="section-number">@</span>
               <span className="tracking-tight font-bold font-mono">Your Library</span>

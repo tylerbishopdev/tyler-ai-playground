@@ -30,7 +30,6 @@ export const FieldSafetyChecker = () => {
                 checked={field.value || false}
                 onCheckedChange={(val) => {
                   field.onChange(val);
-                  field.onBlur();
                 }}
               />
               <Label htmlFor="enable_safety_checker">{field.value ? 'Enabled' : 'Disabled'}</Label>

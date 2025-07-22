@@ -28,6 +28,16 @@ export async function POST(request: Request) {
     const image_url = formData.get('image_url');
     const safety_tolerance = formData.get('safety_tolerance');
     const output_format = formData.get('output_format');
+    
+    // Debug logging for style transfer
+    if (modelId === 'fal-ai/image-editing/style-transfer') {
+      console.log('Style transfer API request:', {
+        image_url,
+        hasImageUrl: !!image_url,
+        imageUrlLength: String(image_url || '').length,
+        imageUrlTrimmed: String(image_url || '').trim(),
+      });
+    }
 
     // Video generation specific fields
     const aspect_ratio = formData.get('aspect_ratio');
@@ -156,18 +166,22 @@ export async function POST(request: Request) {
     }
     // Handle style transfer model with real-time execution
     else if (modelId === 'fal-ai/image-editing/style-transfer') {
-      const body: any = {
+      // This model REQUIRES image_url - it's not optional
+      if (!image_url || !String(image_url).trim()) {
+        return Response.json(
+          { error: 'image_url is required for Style Transfer model' },
+          { status: 400 },
+        );
+      }
+
+      const body = {
         prompt: String(prompt || ''),
+        image_url: String(image_url),
         guidance_scale: Number(guidance_scale) || 3.5,
         num_inference_steps: Number(num_inference_steps) || 30,
         safety_tolerance: String(safety_tolerance || '2'),
         output_format: String(output_format || 'jpeg') as 'jpeg' | 'png',
       };
-
-      // Only include image_url if it's not empty
-      if (image_url && String(image_url).trim()) {
-        body.image_url = String(image_url);
-      }
 
       // Use fal.run for real-time execution
       result = await fal.run(modelId, {
@@ -242,11 +256,42 @@ export async function POST(request: Request) {
 
     return Response.json(result);
   } catch (error) {
-    console.error('API Error:', error);
-    // Log detailed error information for debugging
-    if (error && typeof error === 'object' && 'body' in error) {
-      console.error('Error body:', JSON.stringify(error.body, null, 2));
+    console.error('FAL API Error:', error);
+    
+    // Enhanced error handling with detailed messages
+    if (error && typeof error === 'object') {
+      // FAL-specific error handling
+      if ('body' in error && error.body) {
+        console.error('Error body:', JSON.stringify(error.body, null, 2));
+        const errorBody = error.body as any;
+        
+        // Return more specific error messages
+        if (errorBody.detail) {
+          return Response.json(
+            { error: errorBody.detail, code: 'FAL_API_ERROR' },
+            { status: errorBody.status || 400 }
+          );
+        }
+      }
+      
+      // Handle validation errors
+      if ('message' in error && typeof error.message === 'string') {
+        if (error.message.includes('required')) {
+          return Response.json(
+            { error: error.message, code: 'VALIDATION_ERROR' },
+            { status: 400 }
+          );
+        }
+      }
     }
-    return Response.json({ error: 'Internal server error' }, { status: 500 });
+    
+    // Generic error response
+    return Response.json(
+      { 
+        error: 'Failed to generate content. Please try again.',
+        details: process.env.NODE_ENV === 'development' ? String(error) : undefined,
+      },
+      { status: 500 }
+    );
   }
 }

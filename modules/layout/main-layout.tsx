@@ -35,7 +35,7 @@ export const MainLayout = ({ children, sidebar }: MainLayoutProps) => {
 
                 {/* Main content area */}
                 <main className="flex-1 min-h-screen w-full">
-                    <div className="w-full max-w-9xl mx-auto px-4 lg:px-20 pt-32">
+                    <div className="w-full max-w-9xl mx-auto px-4 lg:px-20 pt-32 pb-8">
                         {/* Section Header */}
 
 

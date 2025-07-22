@@ -37,7 +37,6 @@ export const FieldNumberOfGuidanceScale = () => {
                 step={step}
                 onValueChange={(value) => {
                   field.onChange(value[0]);
-                  field.onBlur();
                 }}
                 className={cn('w-full')}
               />

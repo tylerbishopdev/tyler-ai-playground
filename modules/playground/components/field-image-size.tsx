@@ -49,7 +49,6 @@ export const FieldImageSize = () => {
                 value={typeof field.value === 'string' ? field.value : ''}
                 onValueChange={(value) => {
                   field.onChange(value);
-                  field.onBlur();
 
                   const sizes = IMAGE_SIZE_OPTIONS_MAPPER[value as 'custom'];
 
@@ -79,7 +78,6 @@ export const FieldImageSize = () => {
           </FormItem>
           <FormField
             control={form.control}
-
             name="image_sizes.width"
             render={({ field }) => (
               <FormItem className="flex-row hidden">

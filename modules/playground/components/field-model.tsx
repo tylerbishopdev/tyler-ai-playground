@@ -29,17 +29,16 @@ export const FieldModelId = () => {
       name="modelId"
       render={({ field }) => (
         <FormItem>
-          <FormLabel>Model</FormLabel>
+          <FormLabel className="ml-4"></FormLabel>
           <FormControl>
             <Select
               disabled={form.formState.isSubmitting}
               value={field.value}
               onValueChange={(value) => {
                 field.onChange(value);
-                field.onBlur();
               }}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full bg-black/20 bg-blur-xl border-zinc-500/50 border-2 rounded-full px-4 py-1.5 text-sm outline-none focus:bg-cyan-300/20 data-[state=open]:bg-accent/70">
                 <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>

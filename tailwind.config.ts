@@ -76,6 +76,8 @@ const config = {
       },
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
+        newake: ['Newake', 'sans-serif'],
+        neuve: ['NeuveGrotesk', 'sans-serif'],
       },
     },
   },

@@ -27,11 +27,18 @@ import { useQueryClient } from '@tanstack/react-query';
 type Props = MediaType;
 
 const isVideo = (media: MediaType): media is VideoType => {
-    return media.content_type === 'video/mp4';
+    // Check content type first, then fall back to URL extension
+    return media.content_type === 'video/mp4' || 
+           Boolean(media.url && media.url.toLowerCase().endsWith('.mp4'));
 };
 
 const isImage = (media: MediaType): media is ImageType => {
-    return media.content_type === 'image/jpeg';
+    // Check content type first, then fall back to URL extension
+    return media.content_type === 'image/jpeg' || 
+           Boolean(media.url && (media.url.toLowerCase().endsWith('.jpg') || 
+                                media.url.toLowerCase().endsWith('.jpeg') || 
+                                media.url.toLowerCase().endsWith('.png') || 
+                                media.url.toLowerCase().endsWith('.webp')));
 };
 
 export const MediaDialog = (props: Props) => {

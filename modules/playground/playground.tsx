@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/button';
 import * as React from 'react';
-import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
 import { useMutationGenerateImages } from './hooks/use-mutation-generate-images';
 import { FormType } from './types/form.type';
@@ -25,9 +24,10 @@ import { FieldFaceImage } from '@/modules/playground/components/field-face-image
 import { FieldGender } from '@/modules/playground/components/field-gender';
 import { FieldBodySize } from '@/modules/playground/components/field-body-size';
 import { FieldLocation } from '@/modules/playground/components/field-location';
-
 import { FieldResolution } from '@/modules/playground/components/field-resolution';
 import { FieldVideoDuration } from '@/modules/playground/components/field-video-duration';
+import { FieldSafetyTolerance } from '@/modules/playground/components/field-safety-tolerance';
+import { FieldOutputFormat } from '@/modules/playground/components/field-output-format';
 
 // Client-only wrapper to prevent hydration issues
 const ClientOnlyWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -48,16 +48,40 @@ const ClientOnlyWrapper = ({ children }: { children: React.ReactNode }) => {
 export const PlaygroundForm = () => {
   const { mutateAsync, isPending } = useMutationGenerateImages();
   const form = useFormContext<FormType>();
-
+  
+  // Simple model ID watching without causing infinite loops
+  const modelId = form.watch('modelId');
+  
   const submit = async (body: FormType) => {
+    // Validate required image_url for style transfer
+    if (body.modelId === 'fal-ai/image-editing/style-transfer') {
+      if (!body.image_url || !body.image_url.trim()) {
+        form.setError('image_url', {
+          type: 'manual',
+          message: 'Please upload or provide an image URL for style transfer',
+        });
+        return;
+      }
+    }
+
+    // Validate required image_url for image-to-video
+    if (body.modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
+      if (!body.image_url || !body.image_url.trim()) {
+        form.setError('image_url', {
+          type: 'manual',
+          message: 'Please upload or provide an image URL to animate',
+        });
+        return;
+      }
+    }
+    
     const data = new FormData();
 
-    // Set model-specific defaults for optimal performance
+    // Set model-specific defaults based on FAL documentation
     let inferenceSteps = 28;
     let guidanceScale = 3.5;
 
     switch (body.modelId) {
-
       case 'fal-ai/ideogram/v3':
         inferenceSteps = 30;
         guidanceScale = 7.5;
@@ -71,6 +95,7 @@ export const PlaygroundForm = () => {
         guidanceScale = 2.5;
         break;
       case 'fal-ai/image-editing/style-transfer':
+        // FAL docs: default inference_steps: 30, guidance_scale: 3.5
         inferenceSteps = 30;
         guidanceScale = 3.5;
         break;
@@ -98,62 +123,44 @@ export const PlaygroundForm = () => {
     data.set('seed', String(body.seed));
     data.set('sync_mode', String(body.sync_mode));
 
-    // Video generation specific fields
+    // Model-specific field handling following FAL API specs
     if (body.modelId === 'fal-ai/veo3/fast') {
       data.set('aspect_ratio', body.aspect_ratio || '16:9');
       data.set('duration', body.duration || '8s');
       data.set('enhance_prompt', String(body.enhance_prompt ?? true));
       data.set('generate_audio', String(body.generate_audio ?? true));
-      // Don't set image size fields for video generation
-    }
-    // Style transfer specific fields
+    } 
     else if (body.modelId === 'fal-ai/image-editing/style-transfer') {
-      // Only set image_url if it has a value
-      if (body.image_url && body.image_url.trim()) {
-        data.set('image_url', body.image_url);
-      }
+      // Style transfer specific fields per FAL docs
+      data.set('image_url', body.image_url || '');
       data.set('safety_tolerance', body.safety_tolerance || '2');
       data.set('output_format', body.output_format || 'jpeg');
-      // Don't set image size fields for style transfer
-    }
-    // Fashion photoshoot specific fields
+      // Note: aspect_ratio is also supported by style-transfer per FAL docs
+      if (body.aspect_ratio) {
+        data.set('aspect_ratio', body.aspect_ratio);
+      }
+    } 
     else if (body.modelId === 'easel-ai/fashion-photoshoot') {
-      // Only set image fields if they have values
-      if (body.garment_image && body.garment_image.trim()) {
-        data.set('garment_image', body.garment_image);
-      }
-      if (body.face_image && body.face_image.trim()) {
-        data.set('face_image', body.face_image);
-      }
+      if (body.garment_image?.trim()) data.set('garment_image', body.garment_image);
+      if (body.face_image?.trim()) data.set('face_image', body.face_image);
       data.set('gender', body.gender || 'male');
       data.set('body_size', body.body_size || 'M');
       data.set('location', body.location || 'park');
-      // Don't set image size fields for fashion photoshoot
-    }
-    // Image-to-video specific fields
+    } 
     else if (body.modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
-      // Validate that image_url is required for Kling video model
-      if (!body.image_url || !body.image_url.trim()) {
-        form.setError('image_url', {
-          type: 'manual',
-          message: 'Image URL is required for Kling video model',
-        });
-        return;
-      }
-      data.set('image_url', body.image_url);
+      data.set('image_url', body.image_url || '');
       data.set('duration', body.video_length || '5');
-      // Don't set image size fields for image-to-video
-    } else {
+    } 
+    else {
       // Regular text-to-image models
       data.set('image_size', body.image_size);
       data.set('image_sizes_width', String(body.image_sizes?.width || 200));
       data.set('image_sizes_height', String(body.image_sizes?.height || 200));
     }
 
-    // Only add LoRA if flux-lora model is selected and a LoRA is chosen
+    // Handle LoRA for flux-lora model
     if (body.modelId === 'fal-ai/flux-lora' && body.selectedLora && body.selectedLora !== 'none') {
       const selectedLoraModel = LORA_MODELS.find(lora => lora.id === body.selectedLora);
-
       if (selectedLoraModel) {
         const loraConfig = [{
           path: selectedLoraModel.path,
@@ -163,112 +170,55 @@ export const PlaygroundForm = () => {
         data.set('loras', JSON.stringify(loraConfig));
       }
     } else {
-      // If not flux-lora model or no LoRA selected, send empty array
       data.set('loras', JSON.stringify([]));
     }
 
     await mutateAsync(data);
   };
 
-  const watchedModelId = form.watch('modelId');
-  const isFluxLoraModel = watchedModelId === 'fal-ai/flux-lora';
-  const isStyleTransferModel = watchedModelId === 'fal-ai/image-editing/style-transfer';
-  const isVideoGenerationModel = watchedModelId === 'fal-ai/veo3/fast';
-  const isFashionPhotoshootModel = watchedModelId === 'easel-ai/fashion-photoshoot';
-  const isImageToVideoModel = watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video';
+  // Simple model type checks
+  const isFluxLoraModel = modelId === 'fal-ai/flux-lora';
+  const isStyleTransferModel = modelId === 'fal-ai/image-editing/style-transfer';
+  const isVideoGenerationModel = modelId === 'fal-ai/veo3/fast';
+  const isFashionPhotoshootModel = modelId === 'easel-ai/fashion-photoshoot';
+  const isImageToVideoModel = modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video';
 
-  // Set Tyler as default when switching to flux-lora model
-  React.useEffect(() => {
-    if (isFluxLoraModel && (!form.getValues('selectedLora') || form.getValues('selectedLora') === 'none')) {
-      form.setValue('selectedLora', 'tyler');
-    } else if (!isFluxLoraModel) {
-      form.setValue('selectedLora', 'none');
-    }
-  }, [isFluxLoraModel, form]);
-
-  // Set defaults for style transfer model
-  React.useEffect(() => {
-    if (isStyleTransferModel) {
-      // Set defaults for style transfer
-      if (!form.getValues('safety_tolerance')) {
-        form.setValue('safety_tolerance', '2');
-      }
-      if (!form.getValues('output_format')) {
-        form.setValue('output_format', 'jpeg');
-      }
-      // Clear image URL when switching away from style transfer
-    } else if (form.getValues('image_url')) {
-      form.setValue('image_url', '');
-    }
-  }, [isStyleTransferModel, form]);
-
-  // Set defaults for video generation model
-  React.useEffect(() => {
-    if (isVideoGenerationModel) {
-      // Set defaults for video generation
-      if (!form.getValues('aspect_ratio')) {
-        form.setValue('aspect_ratio', '16:9');
-      }
-      if (!form.getValues('duration')) {
-        form.setValue('duration', '8s');
-      }
-      if (form.getValues('enhance_prompt') === undefined) {
-        form.setValue('enhance_prompt', true);
-      }
-      if (form.getValues('generate_audio') === undefined) {
-        form.setValue('generate_audio', true);
-      }
-    }
-  }, [isVideoGenerationModel, form]);
-
-  // Set defaults for fashion photoshoot model
-  React.useEffect(() => {
-    if (isFashionPhotoshootModel) {
-      // Set defaults for fashion photoshoot
-      if (!form.getValues('gender')) {
-        form.setValue('gender', 'male');
-      }
-      if (!form.getValues('body_size')) {
-        form.setValue('body_size', 'M');
-      }
-      if (!form.getValues('location')) {
-        form.setValue('location', 'park');
-      }
-    }
-  }, [isFashionPhotoshootModel, form]);
-
-  // Set defaults for image-to-video model
-  React.useEffect(() => {
-    if (isImageToVideoModel) {
-      // Set defaults for image-to-video
-      if (!form.getValues('resolution')) {
-        form.setValue('resolution', '720p');
-      }
-      if (!form.getValues('video_length')) {
-        form.setValue('video_length', '5');
-      }
-    }
-  }, [isImageToVideoModel, form]);
+  // Determine which fields to show
+  const showImageSize = !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && !isStyleTransferModel;
+  const showMultipleImages = !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel;
+  const showImageUpload = isStyleTransferModel || isImageToVideoModel;
 
   return (
     <ClientOnlyWrapper>
-      <form className="space-y-6 " onSubmit={form.handleSubmit(submit)}>
+      <form className="space-y-6" onSubmit={form.handleSubmit(submit)}>
         <FieldModelId />
+        
         {isFluxLoraModel && <FieldLora />}
-        {isStyleTransferModel && <FieldImageUpload />}
-        {isImageToVideoModel && <FieldImageUpload />}
+        
+        {showImageUpload && <FieldImageUpload />}
+        
         {isVideoGenerationModel && (
           <>
             <FieldAspectRatio />
             <FieldDuration />
           </>
         )}
+        
+        {isStyleTransferModel && (
+          <>
+            <FieldAspectRatio />
+            <FieldSafetyTolerance />
+            <FieldOutputFormat />
+          </>
+        )}
+        
         {isImageToVideoModel && (
           <>
             <FieldResolution />
             <FieldVideoDuration />
           </>
         )}
+        
         {isFashionPhotoshootModel && (
           <>
             <FieldGarmentImage />
@@ -278,18 +228,22 @@ export const PlaygroundForm = () => {
             <FieldLocation />
           </>
         )}
+        
         <FieldPrompt />
+        
         {isVideoGenerationModel && (
           <>
             <FieldEnhancePrompt />
             <FieldGenerateAudio />
           </>
         )}
-        {!isStyleTransferModel && !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && <FieldImageSize />}
-        {!isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && <FieldNumberOfImages />}
+        
+        {showImageSize && <FieldImageSize />}
+        {showMultipleImages && <FieldNumberOfImages />}
+        
         <FieldSeed />
 
-        <div className="pt-4 ">
+        <div className="pt-4">
           <Button
             disabled={isPending}
             type="submit"
@@ -312,9 +266,7 @@ export const PlaygroundResults = () => {
   return (
     <ClientOnlyWrapper>
       <div className="space-y-12">
-        {/* Images Grid */}
         <div className="space-y-8">
-          {/* Image count display when there are images */}
           {data && data.length > 0 && (
             <div className="text-right">
               <div className="text-sm text-muted-foreground font-mono">
@@ -324,21 +276,15 @@ export const PlaygroundResults = () => {
           )}
 
           {hasNoData && (
-            <div className="flex flex-col items-center justify-center py-14 text-center mx-auto ">
-              <div className="max-w-lg space-y-2 ">
+            <div className="flex flex-col items-center justify-center py-14 text-center mx-auto">
+              <div className="max-w-lg space-y-2">
                 <div className="space-y-0">
-
-
-                  <div className="w-40 h-40 pt-1 pb-1 flex rounded-xl mx-auto  items-center justify-center">
-
-                  </div>
-                  <h3 className=" font-light text-3xl tracking-tight text-orange-200 pb-4 ">Image Will Show Here</h3>
-                  <p className="text-orange-200 text-sm w-4/5 mx-auto border-pink-300/30 border-2 bg-gradient-to-br from-pink-400/20 to-orange-200/20 rounded-full py-2 px-2">
+                  <div className="w-40 h-40 pt-1 pb-1 flex rounded-xl mx-auto items-center justify-center"></div>
+                  <h3 className="font-light text-3xl tracking-tight text-red-200 pb-4">Image Will Show Here</h3>
+                  <p className="text-red-200 text-sm w-4/5 mx-auto border-pink-300/30 border-2 bg-gradient-to-br from-pink-400/20 to-red-200/20 rounded-full py-2 px-2">
                     Use menu to generate images. Images saved in Library.
                   </p>
-
                 </div>
-
               </div>
             </div>
           )}

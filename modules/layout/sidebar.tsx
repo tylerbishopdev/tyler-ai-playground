@@ -26,7 +26,7 @@ export const Sidebar = ({ children, isOpen, onCloseAction }: SidebarProps) => {
             {/* Sidebar */}
             <div
                 className={cn(
-                    'fixed inset-y-0 left-0 z-50 w-96 border-r border-border  lg:border-zinc-400/10 lg:border-2 shadow-orange-400/10 shadow-2xl bg-gradient-to-br from-transparent via-zinc-950/20 to-zinc-500/0 backdrop-blur-lg lg:pt-3 lg:rounded-xl  lg:ml-0  transition-transform duration-300 ease-in-out lg:relative lg:w-auto lg:mt-0 lg:transform-none lg:transition-none lg:h-full',
+                    'fixed inset-y-0 left-0 z-50 w-96 border-r border-border  lg:border-zinc-400/10 lg:border-2 shadow-red-400/10 shadow-2xl bg-gradient-to-br from-transparent via-black/10/20 to-zinc-500/0 backdrop-blur-lg lg:pt-3 lg:rounded-xl  lg:ml-0  transition-transform duration-300 ease-in-out lg:relative lg:w-auto lg:mt-0 lg:transform-none lg:transition-none lg:h-full',
                     isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
                 )}
             >
@@ -47,7 +47,7 @@ export const Sidebar = ({ children, isOpen, onCloseAction }: SidebarProps) => {
                         <div className="p-3 lg:p-3">
                             <div className="hidden lg:block mb-6">
                                 <div className="flex items-baseline space-x-4 mb-4">
-                                    <h2 className="text-xl font-bold tracking-tight text-orange-100 text-center mx-auto">Magic Controls</h2>
+                                    <h2 className="text-xl font-bold tracking-tight text-red-100 text-center mx-auto">Magic Controls</h2>
                                 </div>
                             </div>
 
@@ -56,7 +56,7 @@ export const Sidebar = ({ children, isOpen, onCloseAction }: SidebarProps) => {
                             </div>
                             <p className="text-sm text-muted-foreground px-4 lg:px-6 pt-2 mb-20 lg:mb-6">
                                 <span className="text-xs"> + Default model is fastest </span><br />
-                                <span className="text-xs text-orange-300/80"> ++ Images are cached by browser in Library. </span><br />
+                                <span className="text-xs text-red-300/80"> ++ Images are cached by browser in Library. </span><br />
                                 <span className="text-xs "> +++ Select Flux-Lora for trained subjects.</span>
                             </p>
                         </div>

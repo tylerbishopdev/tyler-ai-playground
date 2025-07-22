@@ -23,9 +23,10 @@ export const useMutationGenerateImages = () => {
   const mutation = useMutation({
     mutationKey: ['generate'],
     mutationFn: async (data: FormData) => {
-      // Use the optimized endpoint with fal.run for real-time performance
-      const response = await httpClient.post<MediaOutputType>('/api/fal/optimized', data);
-      const modelId = data.get('modelId') as string;
+      try {
+        // Use the optimized endpoint with fal.run for real-time performance
+        const response = await httpClient.post<MediaOutputType>('/api/fal/optimized', data);
+        const modelId = data.get('modelId') as string;
 
       let processedResponse: any;
       let mediaItems: MediaType[] = [];
@@ -96,6 +97,18 @@ export const useMutationGenerateImages = () => {
       );
       queryClient.refetchQueries({ queryKey: ['gallery'] });
       return processedResponse;
+      } catch (error: any) {
+        // Enhanced error handling
+        if (error.response?.data) {
+          const errorData = error.response.data;
+          // Throw a more user-friendly error
+          throw new Error(errorData.error || 'Failed to generate content');
+        }
+        throw error;
+      }
+    },
+    onError: (error: Error) => {
+      console.error('Generation failed:', error.message);
     },
   });
 

@@ -5,7 +5,6 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import { FormGeneratorProvider } from '@/modules/form-provider/form-generator-provider';
 import { ClientQueryProvider } from '@/modules/shared/client-query-provider';
-import { ThemeProvider } from '@/modules/shared/theme-provider';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -25,19 +24,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning className="dark">
-      <body className={cn('min-h-screen bg-background font-sans antialiased', fontSans.variable)}>
-        <ClientQueryProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem={false}
-            forcedTheme="dark"
-            disableTransitionOnChange
-          >
+      <body className={cn('min-h-screen font-sans antialiased', fontSans.variable)}>
+        <div className="relative h-screen w-full bg-[url('/bg3.png')] bg-cover bg-center text-white font-sans ">
+          <ClientQueryProvider>
+
             <FormGeneratorProvider>{children}</FormGeneratorProvider>
-          </ThemeProvider>
-        </ClientQueryProvider>
+
+          </ClientQueryProvider>
+        </div>
       </body>
-    </html>
+    </html >
   );
 }

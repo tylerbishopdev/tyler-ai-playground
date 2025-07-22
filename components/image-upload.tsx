@@ -6,22 +6,66 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import { useFormContext, Controller } from 'react-hook-form';
+import { FormType } from '@/modules/playground/types/form.type';
 
 interface ImageUploadProps {
+    label: string;
+    description?: string;
+    className?: string;
+    name: keyof FormType;
+}
+
+export const ImageUpload = ({
+    label,
+    description,
+    className = '',
+    name,
+}: ImageUploadProps) => {
+    const { control, clearErrors } = useFormContext<FormType>();
+
+    return (
+        <Controller
+            name={name}
+            control={control}
+            defaultValue=""
+            render={({ field, fieldState }) => (
+                <ImageUploadComponent
+                    value={field.value as string || ''}
+                    onChange={(url) => {
+                        field.onChange(url);
+                        // Clear any validation errors when a value is set
+                        if (url && fieldState.error) {
+                            clearErrors(name);
+                        }
+                    }}
+                    label={label}
+                    description={description}
+                    className={className}
+                    error={fieldState.error?.message}
+                />
+            )}
+        />
+    );
+};
+
+interface ImageUploadComponentProps {
     value?: string;
     onChange: (url: string) => void;
     label: string;
     description?: string;
     className?: string;
+    error?: string;
 }
 
-export const ImageUpload = ({
+const ImageUploadComponent = ({
     value,
     onChange,
     label,
     description,
     className = '',
-}: ImageUploadProps) => {
+    error,
+}: ImageUploadComponentProps) => {
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const [showUrlInput, setShowUrlInput] = useState(false);
@@ -133,8 +177,8 @@ export const ImageUpload = ({
                 <>
                     <div
                         className={`relative border-2 border-dashed rounded-lg p-6 transition-colors ${dragActive
-                                ? 'border-primary bg-primary/5'
-                                : 'border-border hover:border-primary/50'
+                            ? 'border-primary bg-primary/5'
+                            : 'border-border hover:border-primary/50'
                             } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
                         onDragEnter={handleDrag}
                         onDragLeave={handleDrag}
@@ -221,6 +265,10 @@ export const ImageUpload = ({
 
             {description && (
                 <p className="text-xs text-muted-foreground">{description}</p>
+            )}
+
+            {error && (
+                <p className="text-sm text-destructive mt-2">{error}</p>
             )}
         </div>
     );
