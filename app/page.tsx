@@ -630,7 +630,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                             >
                                 <div className="space-y-4">
                                     <FieldSeed />
-                                    {watchedModelId === 'fal-ai/flux-lora' && <FieldLora />}
+                                    {isFluxLoraModel && <FieldLora />}
                                     {watchedModelId === 'fal-ai/veo3/fast' && (
                                         <>
                                             <FieldAspectRatio />
