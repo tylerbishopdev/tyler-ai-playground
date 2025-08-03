@@ -45,7 +45,7 @@ export const LORA_MODELS = [
     {
         id: 'brian',
         name: 'Brian',
-        path: 'https://storage.googleapis.com/fal-flux-lora/2591dc5eaff047ec94a22a28ee6d33cc_lora.safetensors',
+        path: 'https://storage.googleapis.com/fal-flux-lora/9a1dc5bfbfbe39b43_lora.safetensors',
         weight: 1,
         scale: 1
     },
