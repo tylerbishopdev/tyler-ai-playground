@@ -88,7 +88,7 @@ function DockItem({
                                 disabled={!isEnabled}
                                 className={cn(
                                     "h-12 w-12  rounded-full hover:bg-black/50 hover:text-pink-300 disabled:bg-transparent disabled:cursor-not-allowed group transition-colors flex-shrink-0",
-                                    isOpen ? "bg-black/70 text-pink-300" : "text-yellow-200 hover:text-pink-200",
+                                    isOpen ? "bg-black/70 text-pink-300" : "text-red-200 hover:text-pink-200",
                                     "disabled:text-neutral-300/30",
                                 )}
                             >
@@ -99,7 +99,7 @@ function DockItem({
                             <PopoverContent
                                 side="top"
                                 align="center"
-                                className="w-[90vw] md:max-w-4xl bg-black/20 border-zinc-100/10 rounded-xl text-yellow-100 shadow-red-300/20 backdrop-blur-lg mb-2"
+                                className="w-[90vw] md:max-w-4xl bg-black/20 border-zinc-100/10 rounded-xl text-red-100 shadow-red-300/20 backdrop-blur-lg mb-2"
                                 onOpenAutoFocus={(e) => e.preventDefault()}
                             >
                                 <div className="grid gap-4">
@@ -116,7 +116,7 @@ function DockItem({
                     </Popover>
                 </div>
             </TooltipTrigger>
-            <TooltipContent side="top" className="bg-black/50 border-border text-white">
+            <TooltipContent side="top" className="bg-black/50 border-border text-primary">
                 <p>{label}</p>
             </TooltipContent>
         </Tooltip>
@@ -395,13 +395,11 @@ function DockResults() {
                     )}
 
                     {hasNoData && (
-                        <div className="flex flex-col items-center justify-center min-h-[60vh] pb-2 text-center mx-auto px-4 border border-secondary/40 rounded-xl bg-gradient-to-br from-secondary/10 via-accent/10 to-primary/10">
+                        <div className="flex flex-col items-center justify-center min-h-[60vh] pb-2 text-center mx-auto px-4 border-4 border-border/20 rounded-xl ">
                             <div className="max-w-lg space-y-4">
                                 <div className="space-y-2">
-                                    <h3 className="text-2xl font-bold text-accent/80">Image Will Show Here</h3>
-                                    <p className="text-white/30 text-xs  max-w-md mx-auto">
-                                        Pick a model and use the dock to generate your first image.
-                                    </p>
+                                    <h3 className="text-2xl text-primary/50 font-bold ">Image Will Show Here</h3>
+
                                 </div>
                             </div>
                         </div>
@@ -447,7 +445,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
 
     return (
         <TooltipProvider>
-            <div className="relative h-screen w-full bg-[url('/bg3.png')] bg-cover bg-center text-white font-sans overflow-hidden">
+            <div className="relative h-screen w-full   text-primary font-sans overflow-hidden">
                 <header className="flex justify-between items-center mx-auto z-10 p-0 mt-2 w-full  ">
                     <div className="flex items-center justify-between w-full">
                         {/* Logo - clickable to home */}
@@ -458,23 +456,23 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                             {/* Logo centered above links */}
                             <div className="flex justify-center">
                                 <Image
-                                    src="/image 80.png"
+                                    src="/logo.png"
                                     alt="Tyler AI Playground Logo"
-                                    width={120}
-                                    height={80}
-                                    className="w-24 opacity-60 hue-rotate-90"
+                                    width={320}
+                                    height={160}
+                                    className="w-60 "
                                 />
 
                             </div>
 
                             {/* Links row */}
                             <div className="flex items-center gap-2">
-                                <Link href="/" className="px-4 py-1 text-white/70 hover:text-primary rounded-full transition-all duration-200 text-xl font-bold font-newake tracking-wide">
+                                <Link href="/" className="px-4 py-1 text-primary/70 hover:text-primary rounded-full transition-all duration-200 text-xl font-bold font-newake tracking-wide">
                                     Home
                                 </Link>
                                 <Link
                                     href="/local-gallery"
-                                    className="px-4 py-1 text-white/70 hover:text-primary rounded-full transition-all duration-200 text-xl font-bold font-newake tracking-wide"
+                                    className="px-4 py-1 text-primary/70 hover:text-primary rounded-full transition-all duration-200 text-xl font-bold font-newake tracking-wide"
                                 >
                                     Your Images
                                 </Link>
@@ -523,7 +521,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                                             <PopoverContent
                                                 side="top"
                                                 align="center"
-                                                className="w-auto p-3 bg-black/20 border-zinc-100/10 rounded-xl text-yellow-100 shadow-red-300/20 backdrop-blur-lg mb-2"
+                                                className="w-auto p-3 bg-black/20 border-zinc-100/10 rounded-xl text-red-100 shadow-red-300/20 backdrop-blur-lg mb-2"
                                                 onOpenAutoFocus={(e) => e.preventDefault()}
                                             >
                                                 <div className="space-y-2">
@@ -635,7 +633,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                                         <Rocket size={22} className="md:w-6 md:h-6" />
                                     </Button>
                                 </TooltipTrigger>
-                                <TooltipContent side="top" className="bg-zinc-800 rounded-xl border-zinc-200 text-white">
+                                <TooltipContent side="top" className="bg-zinc-800 rounded-xl border-zinc-200 text-primary">
                                     <p>Generate</p>
                                 </TooltipContent>
                             </Tooltip>

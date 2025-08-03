@@ -38,7 +38,7 @@ export const FieldModelId = () => {
                 field.onChange(value);
               }}
             >
-              <SelectTrigger className="w-full bg-black/20 bg-blur-xl border-zinc-500/50 border-2 rounded-full px-4 py-1.5 text-sm outline-none focus:bg-cyan-300/20 data-[state=open]:bg-accent/70">
+              <SelectTrigger className="w-full bg-black/20 bg-blur-xl border-zinc-500/50 border-2 rounded-full px-4 py-1.5 text-sm outline-none focus:bg-red-300/20 data-[state=open]:bg-accent/70">
                 <SelectValue placeholder="Select a model" />
               </SelectTrigger>
               <SelectContent>

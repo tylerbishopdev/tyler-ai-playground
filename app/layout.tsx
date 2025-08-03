@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="dark">
       <body className={cn('min-h-screen font-sans antialiased', fontSans.variable)}>
-        <div className="relative h-screen w-full bg-[url('/bg3.png')] bg-cover bg-center text-white font-sans ">
+        <div className="relative h-screen bg-background w-full bg-cover bg-center text-primary font-sans ">
           <ClientQueryProvider>
 
             <FormGeneratorProvider>{children}</FormGeneratorProvider>

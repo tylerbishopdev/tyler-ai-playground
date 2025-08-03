@@ -43,7 +43,7 @@ export const FieldSafetyTolerance = () => {
               value={field.value || '2'}
               onValueChange={field.onChange}
             >
-              <SelectTrigger className="w-full bg-black/20 bg-blur-xl rounded-full px-4 py-1.5 text-sm outline-none focus:bg-cyan-300/20 data-[state=open]:bg-accent/70">
+              <SelectTrigger className="w-full bg-black/20 bg-blur-xl rounded-full px-4 py-1.5 text-sm outline-none focus:bg-red-300/20 data-[state=open]:bg-accent/70">
                 <SelectValue placeholder="Select safety level" />
               </SelectTrigger>
               <SelectContent>

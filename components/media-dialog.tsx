@@ -28,17 +28,17 @@ type Props = MediaType;
 
 const isVideo = (media: MediaType): media is VideoType => {
     // Check content type first, then fall back to URL extension
-    return media.content_type === 'video/mp4' || 
-           Boolean(media.url && media.url.toLowerCase().endsWith('.mp4'));
+    return media.content_type === 'video/mp4' ||
+        Boolean(media.url && media.url.toLowerCase().endsWith('.mp4'));
 };
 
 const isImage = (media: MediaType): media is ImageType => {
     // Check content type first, then fall back to URL extension
-    return media.content_type === 'image/jpeg' || 
-           Boolean(media.url && (media.url.toLowerCase().endsWith('.jpg') || 
-                                media.url.toLowerCase().endsWith('.jpeg') || 
-                                media.url.toLowerCase().endsWith('.png') || 
-                                media.url.toLowerCase().endsWith('.webp')));
+    return media.content_type === 'image/jpeg' ||
+        Boolean(media.url && (media.url.toLowerCase().endsWith('.jpg') ||
+            media.url.toLowerCase().endsWith('.jpeg') ||
+            media.url.toLowerCase().endsWith('.png') ||
+            media.url.toLowerCase().endsWith('.webp')));
 };
 
 export const MediaDialog = (props: Props) => {
@@ -78,7 +78,7 @@ export const MediaDialog = (props: Props) => {
                         playsInline
                     />
                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <PlayIcon className="h-12 w-12 text-white opacity-80" />
+                        <PlayIcon className="h-12 w-12 text-primary opacity-80" />
                     </div>
                 </div>
             );
