@@ -467,6 +467,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
     };
 
     const watchedModelId = form.watch('modelId');
+    const isFluxLoraModel = watchedModelId === 'fal-ai/flux-lora';
 
     return (
         <TooltipProvider>
