@@ -17,6 +17,7 @@ const MODELS_TEXT_TO_IMAGE_IDS = [
   'fal-ai/imagen4/preview/fast',
   'fal-ai/image-editing/style-transfer',
   'fal-ai/veo3/fast',
+  'fal-ai/veo3/image-to-video',
   'easel-ai/fashion-photoshoot',
   'fal-ai/kling-video/v2.1/standard/image-to-video',
 ] as const;
@@ -54,6 +55,10 @@ export const MODELS_TEXT_TO_IMAGE: readonly Model[] = [
   {
     id: 'fal-ai/veo3/fast',
     tags: ['inference', 'commercial-use', 'video-generation'],
+  },
+  {
+    id: 'fal-ai/veo3/image-to-video',
+    tags: ['inference', 'commercial-use', 'image-to-video'],
   },
   {
     id: 'easel-ai/fashion-photoshoot',

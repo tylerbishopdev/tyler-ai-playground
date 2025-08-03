@@ -21,6 +21,9 @@ export const FieldImageUpload = () => {
         if (watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
             return 'Input Image (Required)';
         }
+        if (watchedModelId === 'fal-ai/veo3/image-to-video') {
+            return 'Input Image (Required)';
+        }
         return 'Image';
     };
 
@@ -30,6 +33,9 @@ export const FieldImageUpload = () => {
         }
         if (watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
             return 'Upload or provide URL for the image you want to animate into a video';
+        }
+        if (watchedModelId === 'fal-ai/veo3/image-to-video') {
+            return 'Upload or provide URL for the image you want to animate with Veo3';
         }
         return 'Upload or provide URL for the image you want to process';
     };

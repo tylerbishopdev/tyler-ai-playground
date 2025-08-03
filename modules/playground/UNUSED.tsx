@@ -26,6 +26,7 @@ import { FieldBodySize } from '@/modules/playground/components/field-body-size';
 import { FieldLocation } from '@/modules/playground/components/field-location';
 import { FieldResolution } from '@/modules/playground/components/field-resolution';
 import { FieldVideoDuration } from '@/modules/playground/components/field-video-duration';
+import { FieldVeo3Duration } from '@/modules/playground/components/field-veo3-duration';
 import { FieldSafetyTolerance } from '@/modules/playground/components/field-safety-tolerance';
 import { FieldOutputFormat } from '@/modules/playground/components/field-output-format';
 
@@ -48,10 +49,10 @@ const ClientOnlyWrapper = ({ children }: { children: React.ReactNode }) => {
 export const PlaygroundForm = () => {
   const { mutateAsync, isPending } = useMutationGenerateImages();
   const form = useFormContext<FormType>();
-  
+
   // Simple model ID watching without causing infinite loops
   const modelId = form.watch('modelId');
-  
+
   const submit = async (body: FormType) => {
     // Validate required image_url for style transfer
     if (body.modelId === 'fal-ai/image-editing/style-transfer') {
@@ -74,7 +75,18 @@ export const PlaygroundForm = () => {
         return;
       }
     }
-    
+
+    // Validate required image_url for Veo3 image-to-video
+    if (body.modelId === 'fal-ai/veo3/image-to-video') {
+      if (!body.image_url || !body.image_url.trim()) {
+        form.setError('image_url', {
+          type: 'manual',
+          message: 'Please upload or provide an image URL to animate with Veo3',
+        });
+        return;
+      }
+    }
+
     const data = new FormData();
 
     // Set model-specific defaults based on FAL documentation
@@ -108,6 +120,9 @@ export const PlaygroundForm = () => {
       case 'fal-ai/kling-video/v2.1/standard/image-to-video':
         // Image-to-video doesn't use inference steps or guidance scale
         break;
+      case 'fal-ai/veo3/image-to-video':
+        // Veo3 image-to-video doesn't use inference steps or guidance scale
+        break;
       default: // fal-ai/flux-lora
         inferenceSteps = body.num_inference_steps || 28;
         guidanceScale = body.guidance_scale || 3.5;
@@ -129,7 +144,7 @@ export const PlaygroundForm = () => {
       data.set('duration', body.duration || '8s');
       data.set('enhance_prompt', String(body.enhance_prompt ?? true));
       data.set('generate_audio', String(body.generate_audio ?? true));
-    } 
+    }
     else if (body.modelId === 'fal-ai/image-editing/style-transfer') {
       // Style transfer specific fields per FAL docs
       data.set('image_url', body.image_url || '');
@@ -139,18 +154,23 @@ export const PlaygroundForm = () => {
       if (body.aspect_ratio) {
         data.set('aspect_ratio', body.aspect_ratio);
       }
-    } 
+    }
     else if (body.modelId === 'easel-ai/fashion-photoshoot') {
       if (body.garment_image?.trim()) data.set('garment_image', body.garment_image);
       if (body.face_image?.trim()) data.set('face_image', body.face_image);
       data.set('gender', body.gender || 'male');
       data.set('body_size', body.body_size || 'M');
       data.set('location', body.location || 'park');
-    } 
+    }
     else if (body.modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video') {
       data.set('image_url', body.image_url || '');
       data.set('duration', body.video_length || '5');
-    } 
+    }
+    else if (body.modelId === 'fal-ai/veo3/image-to-video') {
+      data.set('image_url', body.image_url || '');
+      data.set('duration', body.veo3_duration || '8s');
+      data.set('generate_audio', String(body.generate_audio ?? true));
+    }
     else {
       // Regular text-to-image models
       data.set('image_size', body.image_size);
@@ -179,46 +199,56 @@ export const PlaygroundForm = () => {
   // Simple model type checks
   const isFluxLoraModel = modelId === 'fal-ai/flux-lora';
   const isStyleTransferModel = modelId === 'fal-ai/image-editing/style-transfer';
-  const isVideoGenerationModel = modelId === 'fal-ai/veo3/fast';
   const isFashionPhotoshootModel = modelId === 'easel-ai/fashion-photoshoot';
-  const isImageToVideoModel = modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video';
+
+  // Video model checks
+  const isTextToVideoModel = modelId === 'fal-ai/veo3/fast';
+  const isImageToVideoModel =
+    modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' ||
+    modelId === 'fal-ai/veo3/image-to-video';
 
   // Determine which fields to show
-  const showImageSize = !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && !isStyleTransferModel;
-  const showMultipleImages = !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel;
   const showImageUpload = isStyleTransferModel || isImageToVideoModel;
+  const showImageSize = !isTextToVideoModel && !isImageToVideoModel && !isFashionPhotoshootModel && !isStyleTransferModel;
+  const showMultipleImages = !isTextToVideoModel && !isImageToVideoModel && !isFashionPhotoshootModel;
 
   return (
     <ClientOnlyWrapper>
       <form className="space-y-6" onSubmit={form.handleSubmit(submit)}>
         <FieldModelId />
-        
+
         {isFluxLoraModel && <FieldLora />}
-        
+
         {showImageUpload && <FieldImageUpload />}
-        
-        {isVideoGenerationModel && (
+
+        {isTextToVideoModel && (
           <>
             <FieldAspectRatio />
             <FieldDuration />
+            <FieldEnhancePrompt />
+            <FieldGenerateAudio />
           </>
         )}
-        
-        {isStyleTransferModel && (
-          <>
-            <FieldAspectRatio />
-            <FieldSafetyTolerance />
-            <FieldOutputFormat />
-          </>
-        )}
-        
+
         {isImageToVideoModel && (
           <>
-            <FieldResolution />
-            <FieldVideoDuration />
+            {/* Kling-specific fields */}
+            {modelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' && (
+              <>
+                <FieldResolution />
+                <FieldVideoDuration />
+              </>
+            )}
+            {/* Veo3 Image-to-Video specific fields */}
+            {modelId === 'fal-ai/veo3/image-to-video' && (
+              <>
+                <FieldVeo3Duration />
+                <FieldGenerateAudio />
+              </>
+            )}
           </>
         )}
-        
+
         {isFashionPhotoshootModel && (
           <>
             <FieldGarmentImage />
@@ -228,19 +258,12 @@ export const PlaygroundForm = () => {
             <FieldLocation />
           </>
         )}
-        
+
         <FieldPrompt />
-        
-        {isVideoGenerationModel && (
-          <>
-            <FieldEnhancePrompt />
-            <FieldGenerateAudio />
-          </>
-        )}
-        
+
         {showImageSize && <FieldImageSize />}
         {showMultipleImages && <FieldNumberOfImages />}
-        
+
         <FieldSeed />
 
         <div className="pt-4">

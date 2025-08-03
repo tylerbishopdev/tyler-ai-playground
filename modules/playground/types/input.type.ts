@@ -114,6 +114,13 @@ export const InputTypeSchema = z.object({
     .enum(['3', '5', '10'])
     .optional()
     .describe('Duration in seconds for image-to-video generation. Default value: "5"'),
+  // Veo3 image-to-video specific fields (duration only supports 8s)
+  veo3_duration: z
+    .enum(['8s'])
+    .optional()
+    .describe(
+      'Duration for Veo3 image-to-video generation. Only 8s is supported. Default value: "8s"',
+    ),
 });
 
 export type InputType = z.infer<typeof InputTypeSchema>;

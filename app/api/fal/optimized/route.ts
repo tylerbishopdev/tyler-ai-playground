@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const image_url = formData.get('image_url');
     const safety_tolerance = formData.get('safety_tolerance');
     const output_format = formData.get('output_format');
-    
+
     // Debug logging for style transfer
     if (modelId === 'fal-ai/image-editing/style-transfer') {
       console.log('Style transfer API request:', {
@@ -57,9 +57,13 @@ export async function POST(request: Request) {
     const video_length = formData.get('video_length');
     const seed = formData.get('seed');
 
+    // Veo3 image-to-video specific fields
+    const veo3_duration = formData.get('duration'); // Already extracted as duration for Veo3
+
     // Define models that require queue processing
     const queueBasedModels = [
       'fal-ai/veo3/fast',
+      'fal-ai/veo3/image-to-video',
       'easel-ai/fashion-photoshoot',
       'fal-ai/kling-video/v2.1/standard/image-to-video',
       'fal-ai/bytedance/seedance/v1/lite/image-to-video',
@@ -74,6 +78,33 @@ export async function POST(request: Request) {
         aspect_ratio: String(aspect_ratio || '16:9'),
         duration: String(duration || '8s'),
         enhance_prompt: Boolean(enhance_prompt === 'true'),
+        generate_audio: Boolean(generate_audio === 'true'),
+      };
+
+      result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS' && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+    }
+    // Handle Veo3 image-to-video model
+    else if (modelId === 'fal-ai/veo3/image-to-video') {
+      // This model REQUIRES image_url - it's not optional
+      if (!image_url || !String(image_url).trim()) {
+        return Response.json(
+          { error: 'image_url is required for Veo3 image-to-video model' },
+          { status: 400 },
+        );
+      }
+
+      const body = {
+        prompt: String(prompt || ''),
+        image_url: String(image_url),
+        duration: String(duration || '8s'), // Only 8s is supported
         generate_audio: Boolean(generate_audio === 'true'),
       };
 
@@ -257,41 +288,38 @@ export async function POST(request: Request) {
     return Response.json(result);
   } catch (error) {
     console.error('FAL API Error:', error);
-    
+
     // Enhanced error handling with detailed messages
     if (error && typeof error === 'object') {
       // FAL-specific error handling
       if ('body' in error && error.body) {
         console.error('Error body:', JSON.stringify(error.body, null, 2));
         const errorBody = error.body as any;
-        
+
         // Return more specific error messages
         if (errorBody.detail) {
           return Response.json(
             { error: errorBody.detail, code: 'FAL_API_ERROR' },
-            { status: errorBody.status || 400 }
+            { status: errorBody.status || 400 },
           );
         }
       }
-      
+
       // Handle validation errors
       if ('message' in error && typeof error.message === 'string') {
         if (error.message.includes('required')) {
-          return Response.json(
-            { error: error.message, code: 'VALIDATION_ERROR' },
-            { status: 400 }
-          );
+          return Response.json({ error: error.message, code: 'VALIDATION_ERROR' }, { status: 400 });
         }
       }
     }
-    
+
     // Generic error response
     return Response.json(
-      { 
+      {
         error: 'Failed to generate content. Please try again.',
         details: process.env.NODE_ENV === 'development' ? String(error) : undefined,
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -28,6 +28,7 @@ import { FieldBodySize } from '@/modules/playground/components/field-body-size';
 import { FieldLocation } from '@/modules/playground/components/field-location';
 import { FieldResolution } from '@/modules/playground/components/field-resolution';
 import { FieldVideoDuration } from '@/modules/playground/components/field-video-duration';
+import { FieldVeo3Duration } from '@/modules/playground/components/field-veo3-duration';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
@@ -155,6 +156,16 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             }
         }
 
+        if (body.modelId === 'fal-ai/veo3/image-to-video') {
+            if (!body.image_url || !body.image_url.trim()) {
+                form.setError('image_url', {
+                    type: 'manual',
+                    message: 'Please upload or provide an image URL to animate with Veo3',
+                });
+                return;
+            }
+        }
+
         const data = new FormData();
 
         // Set model-specific defaults for optimal performance
@@ -186,6 +197,9 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
                 break;
             case 'fal-ai/kling-video/v2.1/standard/image-to-video':
                 // Image-to-video doesn't use inference steps or guidance scale
+                break;
+            case 'fal-ai/veo3/image-to-video':
+                // Veo3 image-to-video doesn't use inference steps or guidance scale
                 break;
             default: // fal-ai/flux-lora
                 inferenceSteps = body.num_inference_steps || 28;
@@ -239,6 +253,17 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             }
             data.set('image_url', body.image_url);
             data.set('duration', body.video_length || '5');
+        } else if (body.modelId === 'fal-ai/veo3/image-to-video') {
+            if (!body.image_url || !body.image_url.trim()) {
+                form.setError('image_url', {
+                    type: 'manual',
+                    message: 'Image URL is required for Veo3 image-to-video model',
+                });
+                return;
+            }
+            data.set('image_url', body.image_url);
+            data.set('duration', body.veo3_duration || '8s');
+            data.set('generate_audio', String(body.generate_audio ?? true));
         } else {
             // Regular text-to-image models
             data.set('image_size', body.image_size);
@@ -269,7 +294,7 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
     const isStyleTransferModel = watchedModelId === 'fal-ai/image-editing/style-transfer';
     const isVideoGenerationModel = watchedModelId === 'fal-ai/veo3/fast';
     const isFashionPhotoshootModel = watchedModelId === 'easel-ai/fashion-photoshoot';
-    const isImageToVideoModel = watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video';
+    const isImageToVideoModel = watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' || watchedModelId === 'fal-ai/veo3/image-to-video';
 
     // Set defaults when model changes
     React.useEffect(() => {
@@ -556,11 +581,12 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                             <DockItem
                                 icon={<Upload size={22} className="md:size-7" />}
                                 label="Uploads"
-                                isEnabled={watchedModelId === 'fal-ai/image-editing/style-transfer' || watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' || watchedModelId === 'easel-ai/fashion-photoshoot'}
+                                isEnabled={watchedModelId === 'fal-ai/image-editing/style-transfer' || watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' || watchedModelId === 'easel-ai/fashion-photoshoot' || watchedModelId === 'fal-ai/veo3/image-to-video'}
                             >
                                 <div className="space-y-4">
                                     {watchedModelId === 'fal-ai/image-editing/style-transfer' && <FieldImageUpload />}
                                     {watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' && <FieldImageUpload />}
+                                    {watchedModelId === 'fal-ai/veo3/image-to-video' && <FieldImageUpload />}
                                     {watchedModelId === 'easel-ai/fashion-photoshoot' && (
                                         <>
                                             <FieldGarmentImage />
@@ -589,7 +615,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                             <DockItem
                                 icon={<AspectRatio size={22} className="md:size-7" />}
                                 label="Format"
-                                isEnabled={!['fal-ai/image-editing/style-transfer', 'fal-ai/veo3/fast', 'easel-ai/fashion-photoshoot', 'fal-ai/kling-video/v2.1/standard/image-to-video'].includes(watchedModelId)}
+                                isEnabled={!['fal-ai/image-editing/style-transfer', 'fal-ai/veo3/fast', 'easel-ai/fashion-photoshoot', 'fal-ai/kling-video/v2.1/standard/image-to-video', 'fal-ai/veo3/image-to-video'].includes(watchedModelId)}
                             >
                                 <div className="space-y-4">
                                     <FieldImageSize />
@@ -617,6 +643,12 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                                         <>
                                             <FieldResolution />
                                             <FieldVideoDuration />
+                                        </>
+                                    )}
+                                    {watchedModelId === 'fal-ai/veo3/image-to-video' && (
+                                        <>
+                                            <FieldVeo3Duration />
+                                            <FieldGenerateAudio />
                                         </>
                                     )}
                                 </div>
