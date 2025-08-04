@@ -104,7 +104,7 @@ export async function POST(request: Request) {
       const body = {
         prompt: String(prompt || ''),
         image_url: String(image_url),
-        duration: String(duration || '8s'), // Only 8s is supported
+        duration: String(veo3_duration || '8s'), // Only 8s is supported
         generate_audio: Boolean(generate_audio === 'true'),
       };
 
