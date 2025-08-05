@@ -1,5 +1,10 @@
 import * as fal from '@fal-ai/serverless-client';
 
+// Configure fal client
+fal.config({
+  credentials: process.env.FAL_KEY || process.env.FAL_API_KEY,
+});
+
 // Ensure this route is always treated as dynamic to prevent any caching or prerendering issues
 export const dynamic = 'force-dynamic';
 

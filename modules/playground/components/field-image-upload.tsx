@@ -50,6 +50,7 @@ export const FieldImageUpload = () => {
                         name="image_url"
                         label={getLabel()}
                         description={getDescription()}
+                        modelId={watchedModelId}
                     />
                     <FormMessage />
                 </FormItem>

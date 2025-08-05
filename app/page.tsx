@@ -261,6 +261,12 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
                 });
                 return;
             }
+            console.log('Veo3 image-to-video submission:', {
+                image_url: body.image_url,
+                veo3_duration: body.veo3_duration,
+                generate_audio: body.generate_audio,
+                prompt: body.prompt
+            });
             data.set('image_url', body.image_url);
             data.set('duration', body.veo3_duration || '8s');
             data.set('generate_audio', String(body.generate_audio ?? true));
@@ -357,6 +363,18 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             }
         }
     }, [isImageToVideoModel, form]);
+
+    // Set defaults for Veo3 image-to-video model
+    React.useEffect(() => {
+        if (watchedModelId === 'fal-ai/veo3/image-to-video') {
+            if (!form.getValues('veo3_duration')) {
+                form.setValue('veo3_duration', '8s');
+            }
+            if (form.getValues('generate_audio') === undefined) {
+                form.setValue('generate_audio', true);
+            }
+        }
+    }, [watchedModelId, form]);
 
     return (
         <ClientOnlyWrapper>

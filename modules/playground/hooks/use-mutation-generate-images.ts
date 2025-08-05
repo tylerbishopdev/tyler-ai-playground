@@ -28,75 +28,75 @@ export const useMutationGenerateImages = () => {
         const response = await httpClient.post<MediaOutputType>('/api/fal/optimized', data);
         const modelId = data.get('modelId') as string;
 
-      let processedResponse: any;
-      let mediaItems: MediaType[] = [];
+        let processedResponse: any;
+        let mediaItems: MediaType[] = [];
 
-      // Handle video response (for any model that returns a `video` field)
-      if ('video' in response.data) {
-        const videoResponse = response.data as VideoOutputType;
-        const videoItem: VideoType = {
-          ...videoResponse.video,
-          // Ensure width/height fallback values if the API omits them
-          width: videoResponse.video.width || Number(data.get('image_sizes_width')) || 1024,
-          height: videoResponse.video.height || Number(data.get('image_sizes_height')) || 576,
-          content_type: 'video/mp4',
-        };
-        mediaItems = [videoItem];
-        processedResponse = {
-          ...videoResponse,
-          images: mediaItems, // Keep 'images' key for compatibility
-        };
-      }
-      // Handle image response
-      else {
-        const imageResponse = response.data as any;
-        // Get the requested dimensions from form data for accurate fallbacks
-        const requestedWidth = Number(data.get('image_sizes_width')) || 1024;
-        const requestedHeight = Number(data.get('image_sizes_height')) || 768;
+        // Handle video response (for any model that returns a `video` field)
+        if ('video' in response.data) {
+          const videoResponse = response.data as VideoOutputType;
+          const videoItem: VideoType = {
+            ...videoResponse.video,
+            // Ensure width/height fallback values if the API omits them
+            width: videoResponse.video.width || Number(data.get('image_sizes_width')) || 1024,
+            height: videoResponse.video.height || Number(data.get('image_sizes_height')) || 576,
+            content_type: 'video/mp4',
+          };
+          mediaItems = [videoItem];
+          processedResponse = {
+            ...videoResponse,
+            images: mediaItems, // Keep 'images' key for compatibility
+          };
+        }
+        // Handle image response
+        else {
+          const imageResponse = response.data as any;
+          // Get the requested dimensions from form data for accurate fallbacks
+          const requestedWidth = Number(data.get('image_sizes_width')) || 1024;
+          const requestedHeight = Number(data.get('image_sizes_height')) || 768;
 
-        // Handle different response formats for different models
-        let imagesArray: any[] = [];
+          // Handle different response formats for different models
+          let imagesArray: any[] = [];
 
-        if (imageResponse?.images) {
-          // Standard format: { images: [...] }
-          imagesArray = imageResponse.images;
-        } else if (imageResponse?.image) {
-          // Single image format: { image: {...} }
-          imagesArray = [imageResponse.image];
-        } else if (Array.isArray(imageResponse)) {
-          // Direct array format: [...]
-          imagesArray = imageResponse;
-        } else if (imageResponse?.url) {
-          // Direct image object format: { url: "...", ... }
-          imagesArray = [imageResponse];
-        } else {
-          console.warn('Unknown response format for model:', modelId, imageResponse);
-          imagesArray = [];
+          if (imageResponse?.images) {
+            // Standard format: { images: [...] }
+            imagesArray = imageResponse.images;
+          } else if (imageResponse?.image) {
+            // Single image format: { image: {...} }
+            imagesArray = [imageResponse.image];
+          } else if (Array.isArray(imageResponse)) {
+            // Direct array format: [...]
+            imagesArray = imageResponse;
+          } else if (imageResponse?.url) {
+            // Direct image object format: { url: "...", ... }
+            imagesArray = [imageResponse];
+          } else {
+            console.warn('Unknown response format for model:', modelId, imageResponse);
+            imagesArray = [];
+          }
+
+          // Ensure all images have width/height properties with accurate fallbacks
+          mediaItems = imagesArray.map((image: any) => ({
+            ...image,
+            width: image.width || requestedWidth,
+            height: image.height || requestedHeight,
+            content_type: image.content_type || 'image/jpeg',
+          }));
+
+          processedResponse = {
+            ...imageResponse,
+            images: mediaItems,
+          };
         }
 
-        // Ensure all images have width/height properties with accurate fallbacks
-        mediaItems = imagesArray.map((image: any) => ({
-          ...image,
-          width: image.width || requestedWidth,
-          height: image.height || requestedHeight,
-          content_type: image.content_type || 'image/jpeg',
-        }));
-
-        processedResponse = {
-          ...imageResponse,
-          images: mediaItems,
-        };
-      }
-
-      addItemToLocalStorageGallery({ ...processedResponse, date: new Date() });
-      queryClient.setQueriesData(
-        {
-          queryKey: ['generated-images'],
-        },
-        mediaItems,
-      );
-      queryClient.refetchQueries({ queryKey: ['gallery'] });
-      return processedResponse;
+        addItemToLocalStorageGallery({ ...processedResponse, date: new Date() });
+        queryClient.setQueriesData(
+          {
+            queryKey: ['generated-images'],
+          },
+          mediaItems,
+        );
+        queryClient.refetchQueries({ queryKey: ['gallery'] });
+        return processedResponse;
       } catch (error: any) {
         // Enhanced error handling
         if (error.response?.data) {
@@ -109,6 +109,7 @@ export const useMutationGenerateImages = () => {
     },
     onError: (error: Error) => {
       console.error('Generation failed:', error.message);
+      console.error('Full error:', error);
     },
   });
 

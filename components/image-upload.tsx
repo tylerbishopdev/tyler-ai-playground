@@ -8,12 +8,14 @@ import { Upload, X, Image as ImageIcon, Loader2 } from 'lucide-react';
 import Image from 'next/image';
 import { useFormContext, Controller } from 'react-hook-form';
 import { FormType } from '@/modules/playground/types/form.type';
+import { ModelTextToImageId } from '@/modules/playground/types/model-text-to-image.type';
 
 interface ImageUploadProps {
     label: string;
     description?: string;
     className?: string;
     name: keyof FormType;
+    modelId: ModelTextToImageId;
 }
 
 export const ImageUpload = ({
@@ -21,6 +23,7 @@ export const ImageUpload = ({
     description,
     className = '',
     name,
+    modelId,
 }: ImageUploadProps) => {
     const { control, clearErrors } = useFormContext<FormType>();
 
@@ -43,6 +46,7 @@ export const ImageUpload = ({
                     description={description}
                     className={className}
                     error={fieldState.error?.message}
+                    modelId={modelId}
                 />
             )}
         />
@@ -56,6 +60,7 @@ interface ImageUploadComponentProps {
     description?: string;
     className?: string;
     error?: string;
+    modelId: ModelTextToImageId;
 }
 
 const ImageUploadComponent = ({
@@ -65,12 +70,24 @@ const ImageUploadComponent = ({
     description,
     className = '',
     error,
+    modelId,
 }: ImageUploadComponentProps) => {
     const [isUploading, setIsUploading] = useState(false);
     const [dragActive, setDragActive] = useState(false);
     const [showUrlInput, setShowUrlInput] = useState(false);
     const [urlValue, setUrlValue] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const fileToDataUri = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result as string);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
 
     const handleUpload = useCallback(async (file: File) => {
         if (!file.type.startsWith('image/')) {
@@ -84,6 +101,20 @@ const ImageUploadComponent = ({
         }
 
         setIsUploading(true);
+
+        if (modelId === 'fal-ai/veo3/image-to-video') {
+            try {
+                const dataUri = await fileToDataUri(file);
+                onChange(dataUri);
+            } catch (error) {
+                console.error('Data URI conversion error:', error);
+                alert('Failed to process image. Please try again.');
+            } finally {
+                setIsUploading(false);
+            }
+            return;
+        }
+
         try {
             const formData = new FormData();
             formData.append('file', file);
@@ -105,7 +136,7 @@ const ImageUploadComponent = ({
         } finally {
             setIsUploading(false);
         }
-    }, [onChange]);
+    }, [onChange, modelId]);
 
     const handleDrag = useCallback((e: React.DragEvent) => {
         e.preventDefault();
