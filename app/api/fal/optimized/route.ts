@@ -63,6 +63,7 @@ export async function POST(request: Request) {
     // Define models that require queue processing
     const queueBasedModels = [
       'fal-ai/veo3/fast',
+      'fal-ai/ideogram/character',
       'fal-ai/veo3/image-to-video',
       'easel-ai/fashion-photoshoot',
       'fal-ai/kling-video/v2.1/standard/image-to-video',
@@ -80,6 +81,33 @@ export async function POST(request: Request) {
         enhance_prompt: Boolean(enhance_prompt === 'true'),
         generate_audio: Boolean(generate_audio === 'true'),
       };
+
+      result = await fal.subscribe(modelId, {
+        input: body,
+        logs: true,
+        onQueueUpdate: (update) => {
+          if (update.status === 'IN_PROGRESS' && update.logs) {
+            update.logs.map((log) => log.message).forEach(console.log);
+          }
+        },
+      });
+    }
+    // Handle Ideogram Character (requires reference_image_urls)
+    else if (modelId === 'fal-ai/ideogram/character') {
+      // Must map our single image_url into reference_image_urls
+      if (!image_url || !String(image_url).trim()) {
+        return Response.json(
+          { error: 'reference image is required for Ideogram Character model' },
+          { status: 400 },
+        );
+      }
+
+      const body = {
+        prompt: String(prompt || ''),
+        reference_image_urls: [String(image_url)],
+        num_images: Number(num_images) || 1,
+        expand_prompt: true,
+      } as any;
 
       result = await fal.subscribe(modelId, {
         input: body,

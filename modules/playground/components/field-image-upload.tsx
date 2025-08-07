@@ -24,6 +24,9 @@ export const FieldImageUpload = () => {
         if (watchedModelId === 'fal-ai/veo3/image-to-video') {
             return 'Input Image (Required)';
         }
+        if (watchedModelId === 'fal-ai/ideogram/character') {
+            return 'Reference Image (Required)';
+        }
         return 'Image';
     };
 
@@ -36,6 +39,9 @@ export const FieldImageUpload = () => {
         }
         if (watchedModelId === 'fal-ai/veo3/image-to-video') {
             return 'Upload or provide URL for the image you want to animate with Veo3';
+        }
+        if (watchedModelId === 'fal-ai/ideogram/character') {
+            return 'Upload or provide URL for the character reference image (required)';
         }
         return 'Upload or provide URL for the image you want to process';
     };

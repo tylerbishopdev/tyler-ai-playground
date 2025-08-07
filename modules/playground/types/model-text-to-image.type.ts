@@ -12,6 +12,7 @@ export type ModelTag =
 
 const MODELS_TEXT_TO_IMAGE_IDS = [
   'fal-ai/ideogram/v3',
+  'fal-ai/ideogram/character',
   'fal-ai/flux-pro',
   'fal-ai/flux-lora',
   'fal-ai/imagen4/preview/fast',
@@ -34,6 +35,10 @@ type Model = {
 export const MODELS_TEXT_TO_IMAGE: readonly Model[] = [
   {
     id: 'fal-ai/ideogram/v3',
+    tags: ['inference', 'commercial-use'],
+  },
+  {
+    id: 'fal-ai/ideogram/character',
     tags: ['inference', 'commercial-use'],
   },
   {

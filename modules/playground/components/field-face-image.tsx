@@ -12,6 +12,7 @@ import { ImageUpload } from '@/components/image-upload';
 
 export const FieldFaceImage = () => {
     const form = useFormContext<FormType>();
+    const modelId = form.watch('modelId');
 
     return (
         <FormField
@@ -24,6 +25,7 @@ export const FieldFaceImage = () => {
                         label="Face Image"
                         description="Upload or provide URL for the face/model image for the fashion photoshoot"
                         className="object-contain overflow-hidden lg:w-[420px] w-[330px]"
+                        modelId={modelId}
                     />
                     <FormMessage />
                 </FormItem>

@@ -156,6 +156,16 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             }
         }
 
+        if (body.modelId === 'fal-ai/ideogram/character') {
+            if (!body.image_url || !body.image_url.trim()) {
+                form.setError('image_url', {
+                    type: 'manual',
+                    message: 'Please upload a reference image URL (required)',
+                });
+                return;
+            }
+        }
+
         if (body.modelId === 'fal-ai/veo3/image-to-video') {
             if (!body.image_url || !body.image_url.trim()) {
                 form.setError('image_url', {
@@ -176,6 +186,9 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             case 'fal-ai/ideogram/v3':
                 inferenceSteps = 30;
                 guidanceScale = 7.5;
+                break;
+            case 'fal-ai/ideogram/character':
+                // queue model, no guidance/inference
                 break;
             case 'fal-ai/flux-pro':
                 inferenceSteps = 25;
@@ -270,6 +283,10 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
             data.set('image_url', body.image_url);
             data.set('duration', body.veo3_duration || '8s');
             data.set('generate_audio', String(body.generate_audio ?? true));
+        } else if (body.modelId === 'fal-ai/ideogram/character') {
+            // Map single image_url to reference_image_urls array and also pass image_url for server validation
+            data.set('image_url', body.image_url || '');
+            data.set('reference_image_urls', JSON.stringify([body.image_url]));
         } else {
             // Regular text-to-image models
             data.set('image_size', body.image_size);
@@ -301,6 +318,7 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
     const isVideoGenerationModel = watchedModelId === 'fal-ai/veo3/fast';
     const isFashionPhotoshootModel = watchedModelId === 'easel-ai/fashion-photoshoot';
     const isImageToVideoModel = watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' || watchedModelId === 'fal-ai/veo3/image-to-video';
+    const isIdeogramCharacter = watchedModelId === 'fal-ai/ideogram/character';
 
     // Set defaults when model changes
     React.useEffect(() => {
@@ -389,7 +407,7 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
                         <FieldDuration />
                     </>
                 )}
-                {isImageToVideoModel && (
+                {(isImageToVideoModel || isIdeogramCharacter) && (
                     <>
                         <FieldResolution />
                         <FieldVideoDuration />
@@ -410,8 +428,8 @@ function DockForm({ setIsPending }: { setIsPending: React.Dispatch<React.SetStat
                         <FieldGenerateAudio />
                     </>
                 )}
-                {!isStyleTransferModel && !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && <FieldImageSize />}
-                {!isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && <FieldNumberOfImages />}
+                {!isStyleTransferModel && !isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && !isIdeogramCharacter && <FieldImageSize />}
+                {!isVideoGenerationModel && !isFashionPhotoshootModel && !isImageToVideoModel && !isIdeogramCharacter && <FieldNumberOfImages />}
                 <FieldSeed />
                 <button type="submit" className="hidden">Submit</button>
             </form>
@@ -449,12 +467,12 @@ function DockResults() {
                     )}
 
                     {(isPending || (data && data.length > 0)) && (
-                        <div className="grid gap-2 md:gap-3 lg:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4">
+                        <div className="grid gap-2 md:gap-3 lg:gap-4 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 px-4 mx-auto">
                             <SkeletonList isPending={isPending} />
                             {!isPending && (data || []).map((x, index) => (
                                 <div
                                     key={x.url}
-                                    className="group relative bg-card border border-border hover:border-accent transition-all duration-300 rounded-xl overflow-hidden"
+                                    className="group relative bg-card border border-border hover:border-accent transition-all duration-300 rounded-xl overflow-hidden mx-auto"
                                 >
                                     <div className="aspect-square overflow-hidden">
                                         <MediaDialog {...x} />
@@ -489,7 +507,7 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
 
     return (
         <TooltipProvider>
-            <div className="relative h-screen w-full   text-primary font-sans overflow-hidden">
+            <div className="relative h-screen w-full mx-auto  text-primary font-sans overflow-hidden">
                 <header className="flex justify-between items-center mx-auto z-10 p-0 mt-2 w-full  ">
                     <div className="flex items-center justify-between w-full">
                         {/* Logo - clickable to home */}
@@ -526,9 +544,9 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                 </header>
 
                 <main className="flex-1 flex flex-col items-center justify-center p-2 relative mx-auto">
-                    <div className="w-full max-w-4xl h-auto flex items-center justify-center">
+                    <div className="w-full max-w-4xl h-auto flex items-center justify-center mx-auto">
                         {isPending ? (
-                            <div className="fixed inset-0 flex items-center justify-center z-40">
+                            <div className="fixed inset-0 flex items-center justify-center z-40 mx-auto">
                                 <div className="pyramid-loader">
                                     <div className="wrapper">
                                         <span className="side side1"></span>
@@ -546,10 +564,10 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                 </main>
 
                 {/* Mobile dock with model button */}
-                <footer className="w-full p-4 fixed bottom-0 left-0 right-0 z-50">
+                <footer className="w-full p-4 fixed bottom-0 left-0 right-0 z-50 mx-auto">
                     <div className="flex justify-center items-center gap-2">
                         {/* Model button - custom larger size */}
-                        <div className="relative flex-shrink-0">
+                        <div className="relativeflex-shrink-0 justify-center items-center">
                             <Tooltip>
                                 <TooltipTrigger asChild>
                                     <div className="p-2">
@@ -600,11 +618,18 @@ function DockLayoutContent({ isPending }: { isPending: boolean }) {
                             <DockItem
                                 icon={<Upload size={22} className="md:size-7" />}
                                 label="Uploads"
-                                isEnabled={watchedModelId === 'fal-ai/image-editing/style-transfer' || watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' || watchedModelId === 'easel-ai/fashion-photoshoot' || watchedModelId === 'fal-ai/veo3/image-to-video'}
+                                isEnabled={
+                                    watchedModelId === 'fal-ai/image-editing/style-transfer' ||
+                                    watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' ||
+                                    watchedModelId === 'fal-ai/veo3/image-to-video' ||
+                                    watchedModelId === 'fal-ai/ideogram/character' ||
+                                    watchedModelId === 'easel-ai/fashion-photoshoot'
+                                }
                             >
                                 <div className="space-y-4">
                                     {watchedModelId === 'fal-ai/image-editing/style-transfer' && <FieldImageUpload />}
                                     {watchedModelId === 'fal-ai/kling-video/v2.1/standard/image-to-video' && <FieldImageUpload />}
+                                    {watchedModelId === 'fal-ai/ideogram/character' && <FieldImageUpload />}
                                     {watchedModelId === 'fal-ai/veo3/image-to-video' && <FieldImageUpload />}
                                     {watchedModelId === 'easel-ai/fashion-photoshoot' && (
                                         <>
